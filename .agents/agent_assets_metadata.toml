@@ -1,0 +1,38 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "8yMDPhvmTOfAYxZRlXWif"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "LEYXDe0l6lAp9fdYFki6H"
+uri = "file://artifacts/mobile/assets/images/facial.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "0bR1fJxihXXvvGhf4GCEQ"
+uri = "file://artifacts/mobile/assets/images/massage.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "kyLyT7R6AgNGCSlsAzIhV"
+uri = "file://artifacts/mobile/assets/images/nails.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "PV1iGEqyyKzXGPjVHniaq"
+uri = "file://artifacts/mobile/assets/images/hair.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "glCuigfRt9dNWklxLyUXd"
+uri = "file://artifacts/mobile/assets/images/body.png"
+type = "image"
+title = "generated_image"
