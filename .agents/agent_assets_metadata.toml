@@ -36,3 +36,27 @@ id = "glCuigfRt9dNWklxLyUXd"
 uri = "file://artifacts/mobile/assets/images/body.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "idDgbwfjfPUaLQhL-PFF5"
+uri = "file://artifacts/spa-deck/public/illust-spa-hero.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "uGwMBrySX1tl2Qa1n2Nka"
+uri = "file://artifacts/spa-deck/public/illust-app.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "1YmRPWfrDuDXkDVQFyAvB"
+uri = "file://artifacts/spa-deck/public/illust-team.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "0Kc5we4usnwNPN9c5OkBh"
+uri = "file://artifacts/spa-deck/public/illust-mpesa.png"
+type = "image"
+title = "generated_image"
