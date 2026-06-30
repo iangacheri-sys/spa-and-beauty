@@ -2,6 +2,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Booking } from '@/constants/data';
 
+export interface Review {
+  id: string;
+  bookingId: string;
+  serviceId: string;
+  staffId: string;
+  rating: number;
+  comment: string;
+  tipAmount: number;
+  createdAt: string;
+}
+
 interface UserProfile {
   name: string;
   phone: string;
@@ -10,14 +21,18 @@ interface UserProfile {
 
 interface BookingContextValue {
   bookings: Booking[];
+  reviews: Review[];
   profile: UserProfile;
   addBooking: (booking: Omit<Booking, 'id' | 'createdAt'>) => Promise<void>;
   cancelBooking: (id: string) => Promise<void>;
+  addReview: (review: Omit<Review, 'id' | 'createdAt'>) => Promise<void>;
+  hasReview: (bookingId: string) => boolean;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   isLoading: boolean;
 }
 
 const BOOKINGS_KEY = '@spa_bookings';
+const REVIEWS_KEY = '@spa_reviews';
 const PROFILE_KEY = '@spa_profile';
 
 const DEFAULT_PROFILE: UserProfile = { name: 'Guest', phone: '', email: '' };
@@ -26,17 +41,20 @@ const BookingContext = createContext<BookingContextValue | null>(null);
 
 export function BookingProvider({ children }: { children: React.ReactNode }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [bJson, pJson] = await Promise.all([
+        const [bJson, rJson, pJson] = await Promise.all([
           AsyncStorage.getItem(BOOKINGS_KEY),
+          AsyncStorage.getItem(REVIEWS_KEY),
           AsyncStorage.getItem(PROFILE_KEY),
         ]);
         if (bJson) setBookings(JSON.parse(bJson));
+        if (rJson) setReviews(JSON.parse(rJson));
         if (pJson) setProfile(JSON.parse(pJson));
       } catch (_) {
       } finally {
@@ -71,6 +89,25 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     [bookings],
   );
 
+  const addReview = useCallback(
+    async (review: Omit<Review, 'id' | 'createdAt'>) => {
+      const newReview: Review = {
+        ...review,
+        id: Date.now().toString() + Math.random().toString(36).substring(2, 6),
+        createdAt: new Date().toISOString(),
+      };
+      const updated = [newReview, ...reviews];
+      setReviews(updated);
+      await AsyncStorage.setItem(REVIEWS_KEY, JSON.stringify(updated));
+    },
+    [reviews],
+  );
+
+  const hasReview = useCallback(
+    (bookingId: string) => reviews.some((r) => r.bookingId === bookingId),
+    [reviews],
+  );
+
   const updateProfile = useCallback(
     async (updates: Partial<UserProfile>) => {
       const updated = { ...profile, ...updates };
@@ -82,7 +119,7 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <BookingContext.Provider
-      value={{ bookings, profile, addBooking, cancelBooking, updateProfile, isLoading }}
+      value={{ bookings, reviews, profile, addBooking, cancelBooking, addReview, hasReview, updateProfile, isLoading }}
     >
       {children}
     </BookingContext.Provider>
