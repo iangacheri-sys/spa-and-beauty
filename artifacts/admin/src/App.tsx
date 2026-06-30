@@ -9,6 +9,7 @@ import Dashboard from "@/pages/Dashboard";
 import Bookings from "@/pages/Bookings";
 import Specialists from "@/pages/Specialists";
 import Services from "@/pages/Services";
+import Staff from "@/pages/Staff";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ function Router() {
         <Route path="/bookings" component={Bookings} />
         <Route path="/specialists" component={Specialists} />
         <Route path="/services" component={Services} />
+        <Route path="/staff" component={Staff} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
