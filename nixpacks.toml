@@ -1,8 +1,15 @@
 [phases.setup]
 nixPkgs = ["nodejs_20"]
+cmds = ["npm install -g pnpm@11.13.0"]
 
 [phases.install]
-cmds = ["npm install -g pnpm@11.13.0", "pnpm install --no-frozen-lockfile"]
+cmds = ["pnpm install --no-frozen-lockfile"]
+
+[phases.build]
+cmds = ["pnpm --filter @workspace/api-server run build"]
+
+[start]
+cmd = "pnpm --filter @workspace/api-server run start"
 
 [variables]
 NODE_ENV = "production"
