@@ -1,106 +1,106 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Booking } from '@/constants/data';
+import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+
+export interface Booking {
+  id: string;
+  userId: string;
+  spaId: string;
+  serviceId: string;
+  therapistId: string;
+  date: string;
+  timeSlot: string;
+  status: 'upcoming' | 'completed' | 'cancelled' | 'no-show';
+  notes?: string;
+  paymentMethod?: string;
+  depositAmount?: number;
+  balanceDue?: number;
+  depositPaid?: boolean;
+  createdAt: string;
+  policyAcknowledged?: boolean;
+}
 
 export interface Review {
   id: string;
   bookingId: string;
   serviceId: string;
-  staffId: string;
+  therapistId: string;
   rating: number;
   comment: string;
   tipAmount: number;
   createdAt: string;
 }
 
-interface UserProfile {
-  name: string;
-  phone: string;
-  email: string;
-}
-
 interface BookingContextValue {
   bookings: Booking[];
   reviews: Review[];
-  profile: UserProfile;
-  addBooking: (booking: Omit<Booking, 'id' | 'createdAt'>) => Promise<void>;
+  addBooking: (booking: Partial<Booking>) => Promise<void>;
   cancelBooking: (id: string) => Promise<void>;
   addReview: (review: Omit<Review, 'id' | 'createdAt'>) => Promise<void>;
   hasReview: (bookingId: string) => boolean;
-  updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   isLoading: boolean;
 }
-
-const BOOKINGS_KEY = '@spa_bookings';
-const REVIEWS_KEY = '@spa_reviews';
-const PROFILE_KEY = '@spa_profile';
-
-const DEFAULT_PROFILE: UserProfile = { name: 'Guest', phone: '', email: '' };
 
 const BookingContext = createContext<BookingContextValue | null>(null);
 
 export function BookingProvider({ children }: { children: React.ReactNode }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function load() {
+      if (!user) {
+        setBookings([]);
+        setIsLoading(false);
+        return;
+      }
       try {
-        const [bJson, rJson, pJson] = await Promise.all([
-          AsyncStorage.getItem(BOOKINGS_KEY),
-          AsyncStorage.getItem(REVIEWS_KEY),
-          AsyncStorage.getItem(PROFILE_KEY),
-        ]);
-        if (bJson) setBookings(JSON.parse(bJson));
-        if (rJson) setReviews(JSON.parse(rJson));
-        if (pJson) setProfile(JSON.parse(pJson));
-      } catch (_) {
+        const data = await apiFetch<Booking[]>('/bookings');
+        setBookings(data);
+      } catch (err) {
+        console.error('Failed to load bookings', err);
       } finally {
         setIsLoading(false);
       }
     }
     load();
-  }, []);
+  }, [user]);
 
   const addBooking = useCallback(
-    async (booking: Omit<Booking, 'id' | 'createdAt'>) => {
-      const newBooking: Booking = {
-        ...booking,
-        id: Date.now().toString() + Math.random().toString(36).substring(2, 7),
-        createdAt: new Date().toISOString(),
-      };
-      const updated = [newBooking, ...bookings];
-      setBookings(updated);
-      await AsyncStorage.setItem(BOOKINGS_KEY, JSON.stringify(updated));
+    async (booking: Partial<Booking>) => {
+      const data = await apiFetch<Booking>('/bookings', {
+        method: 'POST',
+        body: JSON.stringify(booking),
+      });
+      setBookings((prev) => [data, ...prev]);
     },
-    [bookings],
+    [],
   );
 
   const cancelBooking = useCallback(
     async (id: string) => {
-      const updated = bookings.map((b) =>
-        b.id === id ? { ...b, status: 'cancelled' as const } : b,
-      );
-      setBookings(updated);
-      await AsyncStorage.setItem(BOOKINGS_KEY, JSON.stringify(updated));
+      await apiFetch(`/bookings/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'cancelled' }),
+      });
+      setBookings((prev) => prev.map(b => b.id === id ? { ...b, status: 'cancelled' } : b));
     },
-    [bookings],
+    [],
   );
 
   const addReview = useCallback(
     async (review: Omit<Review, 'id' | 'createdAt'>) => {
+      // Mock review for now
       const newReview: Review = {
         ...review,
-        id: Date.now().toString() + Math.random().toString(36).substring(2, 6),
+        id: Date.now().toString(),
         createdAt: new Date().toISOString(),
       };
-      const updated = [newReview, ...reviews];
-      setReviews(updated);
-      await AsyncStorage.setItem(REVIEWS_KEY, JSON.stringify(updated));
+      setReviews((prev) => [newReview, ...prev]);
     },
-    [reviews],
+    [],
   );
 
   const hasReview = useCallback(
@@ -108,18 +108,9 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     [reviews],
   );
 
-  const updateProfile = useCallback(
-    async (updates: Partial<UserProfile>) => {
-      const updated = { ...profile, ...updates };
-      setProfile(updated);
-      await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
-    },
-    [profile],
-  );
-
   return (
     <BookingContext.Provider
-      value={{ bookings, reviews, profile, addBooking, cancelBooking, addReview, hasReview, updateProfile, isLoading }}
+      value={{ bookings, reviews, addBooking, cancelBooking, addReview, hasReview, isLoading }}
     >
       {children}
     </BookingContext.Provider>

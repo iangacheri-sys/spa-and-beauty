@@ -17,6 +17,7 @@ export interface Service {
   price: number;
   rating: number;
   reviews: number;
+  image?: string;
 }
 
 export interface Booking {
@@ -58,14 +59,14 @@ export const specialists: Specialist[] = [
 ];
 
 export const services: Service[] = [
-  { id: '1', name: 'Signature Facial', category: 'Facial', duration: 60, price: 2500, rating: 4.9, reviews: 128 },
-  { id: '2', name: 'Deep Tissue Massage', category: 'Massage', duration: 90, price: 3500, rating: 4.8, reviews: 96 },
-  { id: '3', name: 'Luxury Mani-Pedi', category: 'Nails', duration: 75, price: 1800, rating: 4.7, reviews: 84 },
-  { id: '4', name: 'Keratin Hair Treatment', category: 'Hair', duration: 120, price: 4500, rating: 4.9, reviews: 72 },
-  { id: '5', name: 'Hot Stone Massage', category: 'Massage', duration: 60, price: 3000, rating: 4.8, reviews: 61 },
-  { id: '6', name: 'Express Facial', category: 'Facial', duration: 30, price: 1500, rating: 4.6, reviews: 113 },
-  { id: '7', name: 'Gel Manicure', category: 'Nails', duration: 45, price: 1200, rating: 4.7, reviews: 97 },
-  { id: '8', name: 'Hydrating Body Wrap', category: 'Body', duration: 90, price: 3800, rating: 4.9, reviews: 45 },
+  { id: '1', name: 'Signature Facial', category: 'Facial', duration: 60, price: 2500, rating: 4.9, reviews: 128, image: '/services-demo.png' },
+  { id: '2', name: 'Deep Tissue Massage', category: 'Massage', duration: 90, price: 3500, rating: 4.8, reviews: 96, image: '/services-demo.png' },
+  { id: '3', name: 'Luxury Mani-Pedi', category: 'Nails', duration: 75, price: 1800, rating: 4.7, reviews: 84, image: '/services-demo.png' },
+  { id: '4', name: 'Keratin Hair Treatment', category: 'Hair', duration: 120, price: 4500, rating: 4.9, reviews: 72, image: '/services-demo.png' },
+  { id: '5', name: 'Hot Stone Massage', category: 'Massage', duration: 60, price: 3000, rating: 4.8, reviews: 61, image: '/services-demo.png' },
+  { id: '6', name: 'Express Facial', category: 'Facial', duration: 30, price: 1500, rating: 4.6, reviews: 113, image: '/services-demo.png' },
+  { id: '7', name: 'Gel Manicure', category: 'Nails', duration: 45, price: 1200, rating: 4.7, reviews: 97, image: '/services-demo.png' },
+  { id: '8', name: 'Hydrating Body Wrap', category: 'Body', duration: 90, price: 3800, rating: 4.9, reviews: 45, image: '/services-demo.png' },
 ];
 
 const mockNames = ['Kariuki', 'Njoroge', 'Wamalwa', 'Mutuku', 'Ochieng', 'Akinyi', 'Kemboi', 'Nafula', 'Nyambura', 'Nduta', 'Omondi', 'Chebet', 'Wairimu', 'Muthoni', 'Wangari', 'Nanjala'];

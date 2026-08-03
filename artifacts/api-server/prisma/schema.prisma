@@ -1,0 +1,620 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  PLATFORM_ADMIN
+  SPA_OWNER
+  MANAGER
+  RECEPTIONIST
+  THERAPIST
+  CUSTOMER
+}
+
+enum SubscriptionTier {
+  FREE
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SpaStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum BookingStatus {
+  UPCOMING
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MPESA_PAYBILL
+  MPESA_POCHI
+  MPESA_SEND
+  CARD
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  LOCKED
+  PENDING_VERIFICATION
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String   @unique
+  email     String?  @unique
+  password  String
+  role      Role     @default(CUSTOMER)
+  
+  // New Authentication Fields
+  isDemo              Boolean  @default(false)
+  phoneVerified       Boolean  @default(false)
+  emailVerified       Boolean  @default(false)
+  accountStatus       AccountStatus @default(ACTIVE)
+  lastLogin           DateTime?
+  failedLoginAttempts Int      @default(0)
+  lockUntil           DateTime?
+  tokenVersion        Int      @default(0)
+  authProvider        String   @default("LOCAL")
+  
+  referralCode String?  @unique
+  referredById String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  referredBy   User?       @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals    User[]      @relation("UserReferrals")
+  ownedSpas Spa[]       @relation("SpaOwner")
+  staffSpas Staff[]
+  bookings  Booking[]   @relation("CustomerBookings")
+  messages  ChatMessage[]
+  orders    Order[]     @relation("CustomerOrders")
+  reviews   Review[]
+  loyaltyAccount LoyaltyAccount?
+  deviceTokens   DeviceToken[]
+  wallet         BeautyWallet?
+  sessions       Session[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  deviceInfo   String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastActive   DateTime @default(now())
+  isRevoked    Boolean  @default(false)
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+}
+
+model Spa {
+  id               String           @id @default(uuid())
+  ownerId          String
+  name             String
+  brandStory       String?
+  address          String
+  county           String?
+  latitude         Float?
+  longitude        Float?
+  verified         Boolean          @default(false)
+  rating           Float            @default(0)
+  phone            String
+  email            String?
+  image            String?
+  subscriptionTier SubscriptionTier @default(FREE)
+  approvalStatus   SpaStatus        @default(PENDING)
+  isActive         Boolean          @default(true)
+  setupComplete    Boolean          @default(false)
+  amenities        String[]
+  rankingScore     Float            @default(0)
+  isSponsored      Boolean          @default(false)
+  galleries        String[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Relations
+  owner             User               @relation("SpaOwner", fields: [ownerId], references: [id])
+  staff             Staff[]
+  therapists        Therapist[]
+  services          Service[]
+  classes           TrainingClass[]
+  products          Product[]
+  bookings          Booking[]
+  policies          SpaPolicy?
+  conversations     Conversation[]
+  socialCampaigns   SocialCampaign[]
+  socialConnections SocialConnection[]
+  orders            Order[]
+  reviews           Review[]
+  giftCards         GiftCard[]
+  inventoryMovements InventoryMovement[]
+  timeOff           TimeOff[]
+  commissionRecords CommissionRecord[]
+  paymentSettings   SpaPaymentSettings?
+}
+
+model SpaPaymentSettings {
+  id                 String   @id @default(uuid())
+  spaId              String   @unique
+  activeProvider     String   @default("MPESA_POCHI") // MPESA_PAYBILL, MPESA_TILL, MPESA_POCHI, AIRTEL, CARD
+  
+  // M-Pesa specific fields
+  mpesaPaybillNumber String?
+  mpesaAccountRef    String?  // e.g. Spa Name or dynamic
+  mpesaTillNumber    String?
+  mpesaPochiNumber   String?
+  
+  // Future extensibility
+  stripeAccountId    String?
+  
+  instructions       String?  // Custom message to show client (e.g. "Pay via Pochi to Jane Doe")
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  spa Spa @relation(fields: [spaId], references: [id])
+}
+
+model Staff {
+  id        String   @id @default(uuid())
+  userId    String
+  spaId     String
+  role      Role
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  spa  Spa  @relation(fields: [spaId], references: [id])
+
+  @@unique([userId, spaId])
+}
+
+model Therapist {
+  id          String   @id @default(uuid())
+  spaId       String
+  userId      String   @unique
+  name        String
+  specialties String[]
+  bio         String?
+  avatar      String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  spa       Spa                 @relation(fields: [spaId], references: [id])
+  bookings  Booking[]
+  reviews   Review[]
+  schedules TherapistSchedule[]
+  timeOff   TimeOff[]
+  commissionRecords CommissionRecord[]
+}
+
+model TherapistSchedule {
+  id          String   @id @default(uuid())
+  therapistId String
+  dayOfWeek   Int      // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime   String   // HH:MM
+  endTime     String   // HH:MM
+  isWorking   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  therapist Therapist @relation(fields: [therapistId], references: [id])
+
+  @@unique([therapistId, dayOfWeek])
+}
+
+model TimeOff {
+  id          String   @id @default(uuid())
+  spaId       String
+  therapistId String?  // Optional: if null, applies to the entire spa
+  startDate   String   // YYYY-MM-DD
+  endDate     String   // YYYY-MM-DD
+  reason      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  spa       Spa        @relation(fields: [spaId], references: [id])
+  therapist Therapist? @relation(fields: [therapistId], references: [id])
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  spaId       String
+  name        String
+  category    String
+  duration    Int      // in minutes
+  price       Float
+  description String?
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  commissionPercent Float @default(0)
+  image       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  spa      Spa       @relation(fields: [spaId], references: [id])
+  bookings Booking[]
+  reviews  Review[]
+}
+
+model TrainingClass {
+  id           String   @id @default(uuid())
+  spaId        String
+  title        String
+  instructor   String
+  description  String?
+  date         String   // YYYY-MM-DD
+  startTime    String   // HH:MM
+  endTime      String
+  capacity     Int
+  fee          Float
+  location     String
+  image        String?
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  spa      Spa             @relation(fields: [spaId], references: [id])
+  enrolled ClassEnrollment[]
+}
+
+model ClassEnrollment {
+  id               String   @id @default(uuid())
+  classId          String
+  userId           String
+  status           String   // 'enrolled' | 'waitlist'
+  registrationDate DateTime @default(now())
+
+  trainingClass TrainingClass @relation(fields: [classId], references: [id])
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  spaId     String
+  name      String
+  category  String
+  price     Float
+  rating    Float    @default(0)
+  reviews   Int      @default(0)
+  image     String?
+  stock     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  spa Spa @relation(fields: [spaId], references: [id])
+  orderItems         OrderItem[]
+  inventoryMovements InventoryMovement[]
+}
+
+model Booking {
+  id                  String         @id @default(uuid())
+  spaId               String
+  userId              String
+  therapistId         String
+  serviceId           String
+  date                String         // YYYY-MM-DD
+  timeSlot            String         // HH:MM
+  price               Float
+  status              BookingStatus  @default(UPCOMING)
+  paymentStatus       PaymentStatus  @default(PENDING)
+  paymentMethod       PaymentMethod?
+  depositAmount       Float?
+  depositPaid         Boolean        @default(false)
+  balanceDue          Float?
+  policyAcknowledged  Boolean        @default(false)
+  cancellationOutcome String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  // Relations
+  spa       Spa       @relation(fields: [spaId], references: [id])
+  customer  User      @relation("CustomerBookings", fields: [userId], references: [id])
+  therapist Therapist @relation(fields: [therapistId], references: [id])
+  service   Service   @relation(fields: [serviceId], references: [id])
+  review    Review?
+  commissionRecord CommissionRecord?
+}
+
+model CommissionRecord {
+  id          String   @id @default(uuid())
+  spaId       String
+  therapistId String
+  bookingId   String   @unique
+  amount      Float
+  status      String   @default("PENDING") // PENDING, PAID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  spa       Spa       @relation(fields: [spaId], references: [id])
+  therapist Therapist @relation(fields: [therapistId], references: [id])
+  booking   Booking   @relation(fields: [bookingId], references: [id])
+}
+
+model SpaPolicy {
+  id                      String   @id @default(uuid())
+  spaId                   String   @unique
+  depositType             String   // 'none' | 'fixed' | 'percentage'
+  depositPercent          Float    @default(0)
+  depositFixed            Float    @default(0)
+  depositMinBookingValue  Float    @default(0)
+  depositAppliesTo        String   // 'all' | 'services' | 'classes'
+  depositPolicyText       String?
+  freeCancellationHours   Int      @default(24)
+  lateCancelRetainPercent Float    @default(100)
+  refundPolicy            String   // 'full' | 'partial' | 'transfer' | 'none'
+  rescheduleAllowed       Boolean  @default(true)
+  rescheduleLimitHours    Int      @default(12)
+  cancellationPolicyText  String?
+  noShowRetainPercent     Float    @default(100)
+  noShowPolicyText        String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  spa Spa @relation(fields: [spaId], references: [id])
+}
+
+model Conversation {
+  id               String   @id @default(uuid())
+  spaId            String
+  clientId         String
+  clientName       String
+  clientPhone      String?
+  relatedBookingId String?
+  status           String   // 'open' | 'resolved' | 'blocked'
+  lastMessage      String?
+  lastMessageAt    DateTime @default(now())
+  unreadCount      Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  spa      Spa           @relation(fields: [spaId], references: [id])
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  spaId          String
+  sender         String   // 'client' | 'owner' | 'bot'
+  senderId       String?  // References User if client/owner
+  text           String
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  senderUser   User?        @relation(fields: [senderId], references: [id])
+}
+
+model SocialCampaign {
+  id                 String   @id @default(uuid())
+  spaId              String
+  title              String
+  caption            String?
+  hashtags           String?
+  cta                String
+  platforms          String[]
+  imageUrl           String?
+  deepLink           String?
+  status             String   // 'draft' | 'scheduled' | 'published' | 'failed'
+  scheduledAt        DateTime?
+  reach              Int      @default(0)
+  clicks             Int      @default(0)
+  bookingsAttributed Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  spa Spa @relation(fields: [spaId], references: [id])
+}
+
+model SocialConnection {
+  id          String   @id @default(uuid())
+  spaId       String
+  platform    String
+  connected   Boolean  @default(false)
+  handle      String?
+  connectedAt DateTime?
+
+  spa Spa @relation(fields: [spaId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  spaId       String
+  userId      String
+  totalAmount Float
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  spa         Spa         @relation(fields: [spaId], references: [id])
+  customer    User        @relation(fields: [userId], references: [id], name: "CustomerOrders")
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  productId   String
+  quantity    Int
+  priceAtTime Float
+  
+  order       Order    @relation(fields: [orderId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id             String    @id @default(uuid())
+  spaId          String
+  therapistId    String?
+  serviceId      String?
+  authorId       String
+  bookingId      String    @unique
+  rating         Int
+  title          String?
+  body           String?
+  photos         String[]
+  tags           String[]
+  ownerReply     String?
+  ownerRepliedAt DateTime?
+  aiModerated    Boolean   @default(false)
+  aiSentiment    String?
+  isVisible      Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+
+  spa       Spa        @relation(fields: [spaId], references: [id])
+  author    User       @relation(fields: [authorId], references: [id])
+  booking   Booking    @relation(fields: [bookingId], references: [id])
+  therapist Therapist? @relation(fields: [therapistId], references: [id])
+  service   Service?   @relation(fields: [serviceId], references: [id])
+}
+
+model LoyaltyAccount {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  points    Int      @default(0)
+  tier      String   @default("BRONZE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User                 @relation(fields: [userId], references: [id])
+  transactions LoyaltyTransaction[]
+}
+
+model LoyaltyTransaction {
+  id          String   @id @default(uuid())
+  accountId   String
+  type        String   // 'EARN' | 'REDEEM'
+  points      Int
+  description String
+  createdAt   DateTime @default(now())
+
+  account LoyaltyAccount @relation(fields: [accountId], references: [id])
+}
+
+model DeviceToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  platform  String   // 'ios' | 'android'
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ── Financial Platform ──────────────────────────────────────────────────────
+
+model BeautyWallet {
+  id           String              @id @default(uuid())
+  userId       String              @unique
+  balance      Float               @default(0)
+  currency     String              @default("KES")
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  user         User                @relation(fields: [userId], references: [id])
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id          String       @id @default(uuid())
+  walletId    String
+  type        String       // 'TOPUP' | 'SPEND' | 'REFUND' | 'GIFT_CARD'
+  amount      Float
+  reference   String?
+  description String
+  createdAt   DateTime     @default(now())
+
+  wallet BeautyWallet @relation(fields: [walletId], references: [id])
+}
+
+model GiftCard {
+  id          String    @id @default(uuid())
+  spaId       String?   // null = platform-wide
+  code        String    @unique
+  value       Float
+  balance     Float
+  expiresAt   DateTime?
+  purchasedBy String?
+  redeemedBy  String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  spa Spa? @relation(fields: [spaId], references: [id])
+}
+
+// ── Notifications ────────────────────────────────────────────────────────────
+
+model NotificationLog {
+  id      String   @id @default(uuid())
+  userId  String
+  channel String   // 'PUSH' | 'SMS' | 'WHATSAPP' | 'EMAIL'
+  type    String   // 'REMINDER' | 'PROMO' | 'REVIEW_REQUEST' | 'BIRTHDAY'
+  title   String
+  body    String
+  status  String   @default("SENT") // 'SENT' | 'FAILED' | 'DELIVERED'
+  sentAt  DateTime @default(now())
+}
+
+// ── Inventory ────────────────────────────────────────────────────────────────
+
+model InventoryMovement {
+  id          String   @id @default(uuid())
+  spaId       String
+  productId   String
+  type        String   // 'RESTOCK' | 'SALE' | 'ADJUSTMENT' | 'WASTE'
+  quantity    Int      // positive = in, negative = out
+  note        String?
+  createdAt   DateTime @default(now())
+
+  spa     Spa     @relation(fields: [spaId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+

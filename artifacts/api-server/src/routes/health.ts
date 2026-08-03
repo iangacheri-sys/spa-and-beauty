@@ -1,11 +1,18 @@
 import { Router, type IRouter } from "express";
-import { HealthCheckResponse } from "@workspace/api-zod";
+import { PrismaClient } from '@prisma/client';
 
 const router: IRouter = Router();
+const prisma = new PrismaClient();
 
-router.get("/healthz", (_req, res) => {
-  const data = HealthCheckResponse.parse({ status: "ok" });
-  res.json(data);
+// GET /api/health (and /api/health/healthz for backward compatibility)
+router.get(["/", "/healthz"], async (_req, res) => {
+  try {
+    // Ping DB to ensure it's up
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: "ok", db: "connected" });
+  } catch (error) {
+    res.status(503).json({ status: "error", db: "disconnected" });
+  }
 });
 
 export default router;

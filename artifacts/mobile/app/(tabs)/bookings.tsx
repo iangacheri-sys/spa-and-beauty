@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Alert,
   FlatList,
@@ -10,25 +10,72 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useBookings } from '@/context/BookingContext';
+import { useAuth } from '@/context/AuthContext';
 import { useColors } from '@/hooks/useColors';
-import { SERVICES, STAFF, formatDate, formatPrice } from '@/constants/data';
-import { Booking } from '@/constants/data';
+import { formatDate, formatPrice } from '@/constants/data';
+import { Booking } from '@/context/BookingContext';
+import { apiFetch } from '@/lib/api';
+
+interface Service {
+  id: string;
+  name: string;
+  duration: number;
+  price: number;
+}
+
+interface Therapist {
+  id: string;
+  name: string;
+}
 
 const STATUS_COLORS: Record<Booking['status'], { bg: string; text: string; label: string }> = {
   upcoming: { bg: '#E8F5E9', text: '#2E7D32', label: 'Upcoming' },
   completed: { bg: '#F3E5F5', text: '#6A1B9A', label: 'Completed' },
   cancelled: { bg: '#FFEBEE', text: '#C62828', label: 'Cancelled' },
+  'no-show': { bg: '#FFEBEE', text: '#C62828', label: 'No Show' },
 };
 
 export default function BookingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { bookings, cancelBooking } = useBookings();
+  const { bookings, cancelBooking, isLoading: bookingsLoading } = useBookings();
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
+
+  const [services, setServices] = useState<Record<string, Service>>({});
+  const [therapists, setTherapists] = useState<Record<string, Therapist>>({});
+  const [loadingExtras, setLoadingExtras] = useState(true);
+
+  const { user } = useAuth(); // ADDED THIS
+
+  useEffect(() => {
+    async function loadData() {
+      if (!user) return; // DON'T FETCH IF NOT LOGGED IN
+      try {
+        const [servicesRes, therapistsRes] = await Promise.all([
+          apiFetch<Service[]>('/services'),
+          apiFetch<Therapist[]>('/therapists')
+        ]);
+        const srvMap: Record<string, Service> = {};
+        servicesRes.forEach(s => srvMap[s.id] = s);
+        
+        const thMap: Record<string, Therapist> = {};
+        therapistsRes.forEach(t => thMap[t.id] = t);
+
+        setServices(srvMap);
+        setTherapists(thMap);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingExtras(false);
+      }
+    }
+    loadData();
+  }, [user]);
 
   const topInset = Platform.OS === 'web' ? 67 : insets.top;
   const bottomInset = Platform.OS === 'web' ? 34 : 0;
@@ -146,9 +193,10 @@ export default function BookingsScreen() {
   });
 
   function renderItem({ item }: { item: Booking }) {
-    const service = SERVICES.find((s) => s.id === item.serviceId);
-    const staff = STAFF.find((s) => s.id === item.staffId);
-    const statusStyle = STATUS_COLORS[item.status];
+    const service = services[item.serviceId];
+    const staff = therapists[item.therapistId];
+    const statusKey = (item.status || 'upcoming').toLowerCase() as keyof typeof STATUS_COLORS;
+    const statusStyle = STATUS_COLORS[statusKey] || { bg: '#F1F5F9', text: '#64748B', label: item.status };
     return (
       <View style={s.card}>
         <View style={s.cardTop}>
@@ -172,6 +220,22 @@ export default function BookingsScreen() {
             <Text style={s.metaText}>with {staff.name}</Text>
           </View>
         )}
+        {item.depositAmount !== undefined && item.depositAmount > 0 && (
+          <View style={[s.metaRow, { marginTop: 4 }]}>
+            <Feather name="credit-card" size={13} color={colors.primary} />
+            <Text style={[s.metaText, { color: colors.primary, fontFamily: 'Inter_500Medium' }]}>
+              Deposit Paid: {formatPrice(item.depositAmount)}
+            </Text>
+          </View>
+        )}
+        {item.balanceDue !== undefined && item.balanceDue > 0 && item.status === 'upcoming' && (
+          <View style={s.metaRow}>
+            <Feather name="alert-circle" size={13} color={colors.mutedForeground} />
+            <Text style={s.metaText}>
+              Balance Due: {formatPrice(item.balanceDue)}
+            </Text>
+          </View>
+        )}
         <View style={s.bottomRow}>
           <Text style={s.price}>{formatPrice(service?.price ?? 0)}</Text>
           {item.status === 'upcoming' ? (
@@ -189,6 +253,19 @@ export default function BookingsScreen() {
             </Pressable>
           ) : null}
         </View>
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={[s.container, { alignItems: 'center', justifyContent: 'center', padding: 24 }]}>
+        <Feather name="calendar" size={48} color={colors.primary} style={{ marginBottom: 16 }} />
+        <Text style={[s.emptyTitle, { marginTop: 0 }]}>Sign in to view your bookings</Text>
+        <Text style={s.emptySubtitle}>Track your upcoming appointments and past history.</Text>
+        <Pressable style={s.bookBtn} onPress={() => router.push('/login')}>
+          <Text style={s.bookBtnText}>Sign In</Text>
+        </Pressable>
       </View>
     );
   }

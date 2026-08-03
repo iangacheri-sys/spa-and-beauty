@@ -1,10 +1,9 @@
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { router } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   FlatList,
-  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -12,23 +11,70 @@ import {
   Text,
   TextInput,
   View,
+  ActivityIndicator
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useColors } from '@/hooks/useColors';
-import { CATEGORIES, SERVICES, Category, formatPrice } from '@/constants/data';
+import { apiFetch } from '@/lib/api';
+
+type Category = 'All' | 'Massage' | 'Facial' | 'Nails' | 'Hair' | 'Body' | 'Other';
+const CATEGORIES: Category[] = ['All', 'Massage', 'Facial', 'Nails', 'Hair', 'Body', 'Other'];
+
+export function formatPrice(amount: number) {
+  return new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(amount);
+}
+
+interface Service {
+  id: string;
+  name: string;
+  category: string;
+  duration: number;
+  price: number;
+  description: string;
+  rating: number;
+  reviews: number;
+  image?: string;
+  spaId: string;
+}
 
 export default function ServicesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const [selectedCategory, setSelectedCategory] = useState<Category>('All');
+  const params = useLocalSearchParams();
+  const initialCategory = (params.category as Category) || 'All';
+  const [selectedCategory, setSelectedCategory] = useState<Category>(initialCategory);
+
+  // Update selectedCategory if params.category changes
+  useEffect(() => {
+    if (params.category && CATEGORIES.includes(params.category as Category)) {
+      setSelectedCategory(params.category as Category);
+    }
+  }, [params.category]);
   const [query, setQuery] = useState('');
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadServices() {
+      try {
+        const data = await apiFetch<Service[]>('/services');
+        setServices(data);
+      } catch (e) {
+        console.error('Failed to load services', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadServices();
+  }, []);
 
   const topInset = Platform.OS === 'web' ? 67 : insets.top;
   const bottomInset = Platform.OS === 'web' ? 34 : 0;
 
   const filtered = useMemo(() => {
-    return SERVICES.filter((s) => {
+    return services.filter((s) => {
       const matchCat = selectedCategory === 'All' || s.category === selectedCategory;
       const matchQuery =
         query.trim() === '' ||
@@ -36,7 +82,7 @@ export default function ServicesScreen() {
         s.category.toLowerCase().includes(query.toLowerCase());
       return matchCat && matchQuery;
     });
-  }, [selectedCategory, query]);
+  }, [selectedCategory, query, services]);
 
   const s = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
@@ -67,16 +113,18 @@ export default function ServicesScreen() {
     },
     categoriesRow: {
       paddingHorizontal: 20,
-      paddingVertical: 12,
+      paddingVertical: 10,
       gap: 8,
     },
     categoryPill: {
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 20,
+      paddingHorizontal: 18,
+      paddingVertical: 9,
+      borderRadius: 24,
       borderWidth: 1.5,
+      minWidth: 64,
+      alignItems: 'center',
     },
-    categoryText: { fontSize: 13, fontFamily: 'Inter_500Medium' },
+    categoryText: { fontSize: 13, fontFamily: 'Inter_600SemiBold' },
     serviceRow: {
       backgroundColor: colors.card,
       borderRadius: colors.radius,
@@ -187,7 +235,7 @@ export default function ServicesScreen() {
               router.push(`/service/${item.id}`);
             }}
           >
-            <Image source={item.image} style={s.serviceImg} resizeMode="cover" />
+            <Image source={item.image} style={s.serviceImg} contentFit="cover" transition={200} />
             <View style={s.serviceBody}>
               <View>
                 <Text style={s.serviceName} numberOfLines={1}>{item.name}</Text>

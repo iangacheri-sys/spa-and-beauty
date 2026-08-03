@@ -11,7 +11,7 @@ export interface Service {
   description: string;
   rating: number;
   reviews: number;
-  staffIds: string[];
+  therapistIds: string[];
   image: ImageSourcePropType;
 }
 
@@ -29,11 +29,11 @@ export interface Staff {
 export interface Booking {
   id: string;
   serviceId: string;
-  staffId: string;
+  therapistId: string;
   date: string;
   timeSlot: string;
-  notes: string;
-  status: 'upcoming' | 'completed' | 'cancelled';
+  notes?: string;
+  status: 'upcoming' | 'completed' | 'cancelled' | 'no-show';
   createdAt: string;
 }
 
@@ -103,7 +103,7 @@ export const SERVICES: Service[] = [
       'Our signature facial deeply cleanses, exfoliates, and nourishes your skin using premium botanical ingredients. This personalized treatment targets your unique skin concerns for a radiant, youthful glow.',
     rating: 4.9,
     reviews: 128,
-    staffIds: ['1', '5'],
+    therapistIds: ['1', '5'],
     image: require('../assets/images/facial.png'),
   },
   {
@@ -116,7 +116,7 @@ export const SERVICES: Service[] = [
       'This therapeutic massage targets the deeper layers of muscle tissue, relieving chronic tension and stress. Perfect for those with persistent muscle soreness or postural problems.',
     rating: 4.8,
     reviews: 96,
-    staffIds: ['2'],
+    therapistIds: ['2'],
     image: require('../assets/images/massage.png'),
   },
   {
@@ -129,7 +129,7 @@ export const SERVICES: Service[] = [
       'Indulge in our luxurious manicure and pedicure combo. Includes exfoliation, cuticle care, nail shaping, massage, and your choice of premium nail color.',
     rating: 4.7,
     reviews: 84,
-    staffIds: ['3'],
+    therapistIds: ['3'],
     image: require('../assets/images/nails.png'),
   },
   {
@@ -142,7 +142,7 @@ export const SERVICES: Service[] = [
       'Transform frizzy, unruly hair into silky smooth perfection. Our keratin treatment seals the hair shaft for lasting smoothness and manageability lasting up to 3 months.',
     rating: 4.9,
     reviews: 72,
-    staffIds: ['4'],
+    therapistIds: ['4'],
     image: require('../assets/images/hair.png'),
   },
   {
@@ -155,7 +155,7 @@ export const SERVICES: Service[] = [
       'Smooth, heated basalt stones are placed on key points of the body to warm and relax muscles. Combined with our signature massage techniques for deep relaxation.',
     rating: 4.8,
     reviews: 61,
-    staffIds: ['2'],
+    therapistIds: ['2'],
     image: require('../assets/images/massage.png'),
   },
   {
@@ -168,7 +168,7 @@ export const SERVICES: Service[] = [
       'Short on time? Our express facial delivers rapid results — cleanse, tone, treat, and moisturize in just 30 minutes. Ideal for a quick refresh before a special event.',
     rating: 4.6,
     reviews: 113,
-    staffIds: ['1', '5'],
+    therapistIds: ['1', '5'],
     image: require('../assets/images/facial.png'),
   },
   {
@@ -181,7 +181,7 @@ export const SERVICES: Service[] = [
       'Long-lasting, chip-resistant gel nail color that stays perfect for up to 3 weeks. Includes nail prep, gel application, and UV curing.',
     rating: 4.7,
     reviews: 97,
-    staffIds: ['3'],
+    therapistIds: ['3'],
     image: require('../assets/images/nails.png'),
   },
   {
@@ -194,7 +194,7 @@ export const SERVICES: Service[] = [
       'Our luxurious body wrap uses rich hydrating agents to deeply nourish dry, dull skin. Includes a full body scrub, wrap, and moisturizing treatment for visibly soft, glowing skin.',
     rating: 4.9,
     reviews: 45,
-    staffIds: ['2', '5'],
+    therapistIds: ['2', '8'],
     image: require('../assets/images/body.png'),
   },
 ];
@@ -235,5 +235,6 @@ export function formatDateKey(date: Date): string {
 }
 
 export function formatPrice(price: number): string {
-  return `KES ${price.toLocaleString()}`;
+  return `Ksh ${price.toLocaleString()}`;
 }
+

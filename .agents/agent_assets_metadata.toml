@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "8yMDPhvmTOfAYxZRlXWif"
@@ -60,3 +59,9 @@ id = "0Kc5we4usnwNPN9c5OkBh"
 uri = "file://artifacts/spa-deck/public/illust-mpesa.png"
 type = "image"
 title = "generated_image"
+
+[[outputs]]
+id = "stLMmPC0ElCQkZXo_Hqd3"
+uri = "file://.local/outputs/Beauty-Booker.pptx"
+type = "slides"
+title = "Beauty Booker.pptx"

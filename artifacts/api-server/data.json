@@ -1,0 +1,852 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "name": "Super Admin",
+      "phone": "0700000000",
+      "password": "password",
+      "role": "PLATFORM_ADMIN"
+    },
+    {
+      "id": "u2",
+      "name": "Amani Karanja",
+      "phone": "0711111111",
+      "password": "password",
+      "role": "SPA_OWNER",
+      "spaId": "s1"
+    },
+    {
+      "id": "u3",
+      "name": "Grace Odhiambo",
+      "phone": "0722222222",
+      "password": "password",
+      "role": "THERAPIST",
+      "spaId": "s1"
+    },
+    {
+      "id": "u4",
+      "name": "Fatima Hassan",
+      "phone": "0733333333",
+      "password": "password",
+      "role": "SPA_OWNER",
+      "spaId": "s2"
+    },
+    {
+      "id": "u5",
+      "name": "Demo Client",
+      "phone": "0744444444",
+      "password": "password",
+      "role": "CLIENT"
+    },
+    {
+      "id": "u6",
+      "name": "Lucy Mwangi",
+      "phone": "0755555555",
+      "password": "password",
+      "role": "THERAPIST",
+      "spaId": "s1"
+    },
+    {
+      "id": "u7",
+      "name": "Janet Otieno",
+      "phone": "0766666666",
+      "password": "password",
+      "role": "THERAPIST",
+      "spaId": "s2"
+    },
+    {
+      "id": "u8",
+      "name": "Peter Kimani",
+      "phone": "0777777777",
+      "password": "password",
+      "role": "SPA_OWNER",
+      "spaId": "s3"
+    },
+    {
+      "id": "u9",
+      "name": "Rose Wanjiku",
+      "phone": "0788888888",
+      "password": "password",
+      "role": "THERAPIST",
+      "spaId": "s3"
+    },
+    {
+      "id": "u10",
+      "name": "Sarah Njeri",
+      "phone": "0799999999",
+      "password": "password",
+      "role": "CLIENT"
+    }
+  ],
+  "spas": [
+    {
+      "id": "s1",
+      "name": "Nairobi Spa Hub – Westlands",
+      "brandStory": "Premium wellness in the heart of Westlands. We blend traditional African healing practices with modern spa techniques for an unforgettable experience.",
+      "address": "Woodvale Grove, Westlands",
+      "latitude": -1.2661,
+      "longitude": 36.8087,
+      "verified": true,
+      "rating": 4.8,
+      "phone": "+254 712 000 001",
+      "subscriptionTier": "Pro"
+    },
+    {
+      "id": "s2",
+      "name": "Serenity Spa – Kilimani",
+      "brandStory": "Your urban oasis. Escape the city buzz and indulge in holistic treatments in a serene Kilimani garden setting.",
+      "address": "Argwings Kodhek Rd, Kilimani",
+      "latitude": -1.2894,
+      "longitude": 36.7892,
+      "verified": true,
+      "rating": 4.9,
+      "phone": "+254 712 000 002",
+      "subscriptionTier": "Free"
+    },
+    {
+      "id": "s3",
+      "name": "Glamour Studio – Karen",
+      "brandStory": "Where beauty meets nature. Set against the lush Karen landscape, we offer world-class treatments with locally sourced ingredients.",
+      "address": "Karen Rd, Karen",
+      "latitude": -1.3187,
+      "longitude": 36.712,
+      "verified": true,
+      "rating": 4.7,
+      "phone": "+254 712 000 003",
+      "subscriptionTier": "Pro"
+    },
+    {
+      "id": "s4",
+      "name": "Urban Glow Spa – CBD",
+      "brandStory": "Quick, quality beauty services for the modern Nairobian. Conveniently located downtown for your lunch-break pampering.",
+      "address": "Kenyatta Ave, CBD",
+      "latitude": -1.2864,
+      "longitude": 36.8172,
+      "verified": false,
+      "rating": 4.5,
+      "phone": "+254 712 000 004",
+      "subscriptionTier": "Free"
+    }
+  ],
+  "therapists": [
+    {
+      "id": "t1",
+      "spaId": "s1",
+      "userId": "u3",
+      "name": "Grace Odhiambo",
+      "specialties": [
+        "Massage",
+        "Facial",
+        "Nails",
+        "Hair"
+      ],
+      "bio": "Senior therapist with 5 years experience in deep tissue and Swedish massage.",
+      "isActive": true
+    },
+    {
+      "id": "t2",
+      "spaId": "s1",
+      "userId": "u6",
+      "name": "Lucy Mwangi",
+      "specialties": [
+        "Nails",
+        "Waxing",
+        "Facial"
+      ],
+      "bio": "Certified nail technician and skincare enthusiast.",
+      "isActive": true
+    },
+    {
+      "id": "t3",
+      "spaId": "s2",
+      "userId": "u7",
+      "name": "Janet Otieno",
+      "specialties": [
+        "Massage",
+        "Body"
+      ],
+      "bio": "Holistic wellness practitioner specialising in aromatherapy.",
+      "isActive": true
+    },
+    {
+      "id": "t4",
+      "spaId": "s3",
+      "userId": "u9",
+      "name": "Rose Wanjiku",
+      "specialties": [
+        "Hair",
+        "Facial",
+        "Makeup"
+      ],
+      "bio": "Award-winning stylist with a passion for African beauty.",
+      "isActive": true
+    }
+  ],
+  "services": [
+    {
+      "id": "srv1",
+      "spaId": "s1",
+      "name": "Signature Facial",
+      "category": "Facial",
+      "duration": 60,
+      "price": 2500,
+      "description": "Deep cleansing facial using premium botanical ingredients.",
+      "rating": 4.9,
+      "reviews": 128,
+      "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv2",
+      "spaId": "s1",
+      "name": "Deep Tissue Massage",
+      "category": "Massage",
+      "duration": 90,
+      "price": 3500,
+      "description": "Therapeutic massage targeting deeper muscle layers.",
+      "rating": 4.8,
+      "reviews": 96,
+      "image": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv3",
+      "spaId": "s1",
+      "name": "Gel Manicure",
+      "category": "Nails",
+      "duration": 45,
+      "price": 1800,
+      "description": "Long-lasting gel polish application with nail shaping.",
+      "rating": 4.7,
+      "reviews": 74,
+      "image": "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv4",
+      "spaId": "s2",
+      "name": "Aromatherapy Massage",
+      "category": "Massage",
+      "duration": 75,
+      "price": 3000,
+      "description": "Relaxing massage with essential oils.",
+      "rating": 4.9,
+      "reviews": 112,
+      "image": "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv5",
+      "spaId": "s2",
+      "name": "Classic Manicure",
+      "category": "Nails",
+      "duration": 45,
+      "price": 1500,
+      "description": "Classic nail care and polish.",
+      "rating": 4.7,
+      "reviews": 45,
+      "image": "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv6",
+      "spaId": "s2",
+      "name": "Luxury Body Wrap",
+      "category": "Body",
+      "duration": 90,
+      "price": 4500,
+      "description": "Full body detox wrap with shea butter and African botanicals.",
+      "rating": 4.8,
+      "reviews": 33,
+      "image": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv7",
+      "spaId": "s3",
+      "name": "Bridal Makeup",
+      "category": "Makeup",
+      "duration": 120,
+      "price": 8000,
+      "description": "Complete bridal makeup with trial session.",
+      "rating": 5,
+      "reviews": 28,
+      "image": "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv8",
+      "spaId": "s3",
+      "name": "Hair Braiding",
+      "category": "Hair",
+      "duration": 180,
+      "price": 3500,
+      "description": "Intricate braiding styles with quality extensions.",
+      "rating": 4.6,
+      "reviews": 62,
+      "image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv9",
+      "spaId": "s4",
+      "name": "Express Facial",
+      "category": "Facial",
+      "duration": 30,
+      "price": 1200,
+      "description": "Quick rejuvenating facial for your lunch break.",
+      "rating": 4.5,
+      "reviews": 89,
+      "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80",
+      "isActive": true
+    },
+    {
+      "id": "srv10",
+      "spaId": "s4",
+      "name": "Swedish Massage",
+      "category": "Massage",
+      "duration": 60,
+      "price": 2000,
+      "description": "Classic relaxation massage.",
+      "rating": 4.6,
+      "reviews": 55,
+      "image": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80",
+      "isActive": true
+    }
+  ],
+  "classes": [
+    {
+      "id": "c1",
+      "spaId": "s1",
+      "title": "Advanced Massage Techniques",
+      "instructor": "Grace Odhiambo",
+      "description": "Master deep tissue and Swedish massage integration for better therapeutic outcomes.",
+      "date": "2026-08-15",
+      "startTime": "09:00",
+      "endTime": "16:00",
+      "capacity": 12,
+      "fee": 15000,
+      "location": "Nairobi Spa Hub Training Center",
+      "isPublished": true,
+      "enrolled": []
+    },
+    {
+      "id": "c2",
+      "spaId": "s1",
+      "title": "Skincare Fundamentals",
+      "instructor": "Lucy Mwangi",
+      "description": "Learn the science of skincare for different skin types.",
+      "date": "2026-08-22",
+      "startTime": "10:00",
+      "endTime": "14:00",
+      "capacity": 15,
+      "fee": 8000,
+      "location": "Nairobi Spa Hub Training Center",
+      "isPublished": true,
+      "enrolled": [
+        {
+          "name": "Terry sharon",
+          "email": "Fhnnv@gmail.com",
+          "phone": "0745258632",
+          "status": "enrolled",
+          "id": "1784190269291",
+          "registrationDate": "2026-07-16T08:24:29.292Z"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "spaId": "s2",
+      "title": "Aromatherapy Certification",
+      "instructor": "Janet Otieno",
+      "description": "Complete certification course in therapeutic aromatherapy.",
+      "date": "2026-09-01",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "capacity": 10,
+      "fee": 25000,
+      "location": "Serenity Spa Kilimani",
+      "isPublished": true,
+      "enrolled": []
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "spaId": "s1",
+      "name": "Hydrating Facial Serum",
+      "category": "Skincare",
+      "price": 3500,
+      "rating": 4.8,
+      "reviews": 124,
+      "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80",
+      "stock": 45
+    },
+    {
+      "id": "p2",
+      "spaId": "s1",
+      "name": "Aromatherapy Massage Oil",
+      "category": "Body Care",
+      "price": 2200,
+      "rating": 4.9,
+      "reviews": 89,
+      "image": "https://images.unsplash.com/photo-1608248593842-83562a033c4c?auto=format&fit=crop&q=80",
+      "stock": 32
+    },
+    {
+      "id": "p3",
+      "spaId": "s1",
+      "name": "Shea Butter Body Cream",
+      "category": "Body Care",
+      "price": 1800,
+      "rating": 4.7,
+      "reviews": 56,
+      "image": "https://images.unsplash.com/photo-1608248593842-83562a033c4c?auto=format&fit=crop&q=80",
+      "stock": 28
+    },
+    {
+      "id": "p4",
+      "spaId": "s2",
+      "name": "Essential Oil Set",
+      "category": "Aromatherapy",
+      "price": 4500,
+      "rating": 4.9,
+      "reviews": 67,
+      "image": "https://images.unsplash.com/photo-1608248593842-83562a033c4c?auto=format&fit=crop&q=80",
+      "stock": 15
+    },
+    {
+      "id": "p5",
+      "spaId": "s3",
+      "name": "Braiding Hair Extensions",
+      "category": "Hair",
+      "price": 1500,
+      "rating": 4.6,
+      "reviews": 42,
+      "image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80",
+      "stock": 60
+    }
+  ],
+  "bookings": [
+    {
+      "id": "b1",
+      "spaId": "s1",
+      "userId": "u5",
+      "therapistId": "t1",
+      "serviceId": "srv1",
+      "date": "2026-07-15",
+      "timeSlot": "10:00",
+      "price": 2500,
+      "status": "cancelled",
+      "paymentStatus": "refunded",
+      "paymentMethod": "mpesa_paybill",
+      "createdAt": "2026-07-14T08:00:00Z"
+    },
+    {
+      "id": "b2",
+      "spaId": "s1",
+      "userId": "u10",
+      "therapistId": "t1",
+      "serviceId": "srv2",
+      "date": "2026-07-15",
+      "timeSlot": "14:00",
+      "price": 3500,
+      "status": "upcoming",
+      "paymentStatus": "paid",
+      "paymentMethod": "mpesa_send",
+      "createdAt": "2026-07-14T10:30:00Z"
+    },
+    {
+      "id": "b3",
+      "spaId": "s1",
+      "userId": "u5",
+      "therapistId": "t2",
+      "serviceId": "srv3",
+      "date": "2026-07-14",
+      "timeSlot": "11:00",
+      "price": 1800,
+      "status": "completed",
+      "paymentStatus": "paid",
+      "paymentMethod": "card",
+      "createdAt": "2026-07-13T15:00:00Z"
+    },
+    {
+      "id": "b4",
+      "spaId": "s1",
+      "userId": "u10",
+      "therapistId": "t1",
+      "serviceId": "srv1",
+      "date": "2026-07-12",
+      "timeSlot": "09:00",
+      "price": 2500,
+      "status": "completed",
+      "paymentStatus": "paid",
+      "paymentMethod": "mpesa_pochi",
+      "createdAt": "2026-07-11T09:00:00Z"
+    },
+    {
+      "id": "b5",
+      "spaId": "s2",
+      "userId": "u5",
+      "therapistId": "t3",
+      "serviceId": "srv4",
+      "date": "2026-07-15",
+      "timeSlot": "11:00",
+      "price": 3000,
+      "status": "cancelled",
+      "paymentStatus": "refunded",
+      "paymentMethod": "mpesa_paybill",
+      "createdAt": "2026-07-14T12:00:00Z"
+    },
+    {
+      "id": "b6",
+      "spaId": "s2",
+      "userId": "u10",
+      "therapistId": "t3",
+      "serviceId": "srv6",
+      "date": "2026-07-13",
+      "timeSlot": "15:00",
+      "price": 4500,
+      "status": "completed",
+      "paymentStatus": "paid",
+      "paymentMethod": "card",
+      "createdAt": "2026-07-12T14:00:00Z"
+    },
+    {
+      "id": "b7",
+      "spaId": "s1",
+      "userId": "u5",
+      "therapistId": "t1",
+      "serviceId": "srv2",
+      "date": "2026-07-10",
+      "timeSlot": "16:00",
+      "price": 3500,
+      "status": "cancelled",
+      "paymentStatus": "refunded",
+      "paymentMethod": "mpesa_send",
+      "createdAt": "2026-07-09T11:00:00Z"
+    },
+    {
+      "id": "b8",
+      "spaId": "s3",
+      "userId": "u10",
+      "therapistId": "t4",
+      "serviceId": "srv7",
+      "date": "2026-07-16",
+      "timeSlot": "10:00",
+      "price": 8000,
+      "status": "completed",
+      "paymentStatus": "pending",
+      "createdAt": "2026-07-15T07:00:00Z"
+    }
+  ],
+  "policies": [
+    {
+      "spaId": "s1",
+      "depositType": "percentage",
+      "depositPercent": 50,
+      "depositFixed": 0,
+      "depositMinBookingValue": 1000,
+      "depositAppliesTo": "all",
+      "depositPolicyText": "A 50% deposit is required to confirm your booking. The remaining balance is payable at the spa upon completion of your treatment.",
+      "freeCancellationHours": 24,
+      "lateCancelRetainPercent": 100,
+      "refundPolicy": "full",
+      "rescheduleAllowed": true,
+      "rescheduleLimitHours": 12,
+      "cancellationPolicyText": "Cancel at least 24 hours before your appointment for a full refund. Cancellations made less than 24 hours before are non-refundable.",
+      "noShowRetainPercent": 100,
+      "noShowPolicyText": "Clients who do not show up without prior notice will forfeit their full deposit.",
+      "updatedAt": "2026-07-01T00:00:00Z"
+    },
+    {
+      "spaId": "s5",
+      "depositType": "percentage",
+      "depositPercent": 50,
+      "depositFixed": 0,
+      "depositMinBookingValue": 2000,
+      "depositAppliesTo": "all",
+      "depositPolicyText": "A 50% deposit is required to secure your coastal spa experience. Balance is due at the venue after your treatment.",
+      "freeCancellationHours": 48,
+      "lateCancelRetainPercent": 50,
+      "refundPolicy": "partial",
+      "rescheduleAllowed": true,
+      "rescheduleLimitHours": 24,
+      "cancellationPolicyText": "Free cancellation 48 hours before your appointment. Between 24-48 hours: 50% deposit retained. Less than 24 hours: full deposit forfeited.",
+      "noShowRetainPercent": 100,
+      "noShowPolicyText": "No-shows will forfeit 100% of their deposit. Please contact us to reschedule if you cannot make it.",
+      "updatedAt": "2026-07-01T00:00:00Z"
+    },
+    {
+      "spaId": "s6",
+      "depositType": "percentage",
+      "depositPercent": 75,
+      "depositFixed": 0,
+      "depositMinBookingValue": 5000,
+      "depositAppliesTo": "all",
+      "depositPolicyText": "A 75% deposit is required for all bookings above Ksh 5,000.",
+      "freeCancellationHours": 72,
+      "lateCancelRetainPercent": 75,
+      "refundPolicy": "partial",
+      "rescheduleAllowed": true,
+      "rescheduleLimitHours": 48,
+      "cancellationPolicyText": "Cancel 72+ hours before for a full refund. 24-72 hours: 75% of deposit retained. Under 24 hours: no refund.",
+      "noShowRetainPercent": 100,
+      "noShowPolicyText": "No-show policy: 100% of deposit is non-refundable.",
+      "updatedAt": "2026-07-01T00:00:00Z"
+    }
+  ],
+  "conversations": [
+    {
+      "id": "conv1",
+      "spaId": "s5",
+      "clientId": "u5",
+      "clientName": "Demo Client",
+      "clientPhone": "0744444444",
+      "relatedBookingId": "b9",
+      "status": "open",
+      "lastMessage": "Hi, do you offer any package deals for a birthday treat?",
+      "lastMessageAt": "2026-07-20T09:30:00Z",
+      "unreadCount": 0,
+      "messages": [
+        {
+          "id": "m1",
+          "conversationId": "conv1",
+          "spaId": "s5",
+          "sender": "client",
+          "senderName": "Demo Client",
+          "text": "Hi, do you offer any package deals for a birthday treat?",
+          "timestamp": "2026-07-20T09:30:00Z",
+          "read": true
+        }
+      ]
+    },
+    {
+      "id": "conv2",
+      "spaId": "s5",
+      "clientId": "u10",
+      "clientName": "Sarah Njeri",
+      "clientPhone": "0799999999",
+      "status": "open",
+      "lastMessage": "What is the best treatment for oily skin?",
+      "lastMessageAt": "2026-07-19T14:20:00Z",
+      "unreadCount": 2,
+      "messages": [
+        {
+          "id": "m2",
+          "conversationId": "conv2",
+          "spaId": "s5",
+          "sender": "client",
+          "senderName": "Sarah Njeri",
+          "text": "Hello! I have oily skin and I've been struggling with breakouts.",
+          "timestamp": "2026-07-19T14:15:00Z",
+          "read": false
+        },
+        {
+          "id": "m3",
+          "conversationId": "conv2",
+          "spaId": "s5",
+          "sender": "client",
+          "senderName": "Sarah Njeri",
+          "text": "What is the best treatment for oily skin?",
+          "timestamp": "2026-07-19T14:20:00Z",
+          "read": false
+        }
+      ]
+    },
+    {
+      "id": "conv3",
+      "spaId": "s1",
+      "clientId": "u5",
+      "clientName": "Demo Client",
+      "clientPhone": "0744444444",
+      "relatedBookingId": "b1",
+      "status": "open",
+      "lastMessage": "Is Grace available on Saturday instead?",
+      "lastMessageAt": "2026-07-20T10:00:00Z",
+      "unreadCount": 0,
+      "messages": [
+        {
+          "id": "m4",
+          "conversationId": "conv3",
+          "spaId": "s1",
+          "sender": "bot",
+          "senderName": "Spa Assistant",
+          "text": "Hello! Welcome to Nairobi Spa Hub. How can I help you today?",
+          "timestamp": "2026-07-20T09:55:00Z",
+          "read": true
+        },
+        {
+          "id": "m5",
+          "conversationId": "conv3",
+          "spaId": "s1",
+          "sender": "client",
+          "senderName": "Demo Client",
+          "text": "I have a booking on Friday with Grace. Can I move it to Saturday?",
+          "timestamp": "2026-07-20T09:58:00Z",
+          "read": true
+        },
+        {
+          "id": "m6",
+          "conversationId": "conv3",
+          "spaId": "s1",
+          "sender": "owner",
+          "senderName": "Amani Karanja",
+          "text": "Hi! Of course, let me check Grace's availability. One moment.",
+          "timestamp": "2026-07-20T09:59:00Z",
+          "read": true
+        },
+        {
+          "id": "m7",
+          "conversationId": "conv3",
+          "spaId": "s1",
+          "sender": "client",
+          "senderName": "Demo Client",
+          "text": "Is Grace available on Saturday instead?",
+          "timestamp": "2026-07-20T10:00:00Z",
+          "read": true
+        }
+      ]
+    }
+  ],
+  "socialCampaigns": [
+    {
+      "id": "sc1",
+      "spaId": "s5",
+      "title": "July Beach Glow Promo",
+      "caption": "Treat yourself to our Advanced Microdermabrasion this July! Beach-ready skin awaits at Bofa Beach Wellness Lounge. Book now!",
+      "hashtags": "#KilifiSpa #BeachGlow #SkinCare #MicrodermabrasionKilifi",
+      "cta": "book_now",
+      "platforms": [
+        "instagram",
+        "facebook",
+        "whatsapp"
+      ],
+      "imageUrl": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "deepLink": "beautybooker://spa/s5/service/srv11",
+      "scheduledAt": "2026-07-21T08:00:00Z",
+      "status": "scheduled",
+      "reach": 0,
+      "clicks": 0,
+      "bookingsAttributed": 0,
+      "createdAt": "2026-07-20T07:00:00Z"
+    },
+    {
+      "id": "sc2",
+      "spaId": "s5",
+      "title": "Vitamin C Product Launch",
+      "caption": "Introducing our Vitamin C Complex - your daily dose of radiance! Available at Bofa Beach Wellness Lounge.",
+      "hashtags": "#VitaminC #Skincare #KilifiBeauty",
+      "cta": "shop_products",
+      "platforms": [
+        "instagram",
+        "tiktok"
+      ],
+      "imageUrl": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80",
+      "deepLink": "beautybooker://spa/s5/product/p6",
+      "status": "published",
+      "reach": 4820,
+      "clicks": 312,
+      "bookingsAttributed": 18,
+      "createdAt": "2026-07-15T09:00:00Z"
+    },
+    {
+      "id": "sc3",
+      "spaId": "s5",
+      "title": "Chemical Peels Masterclass",
+      "caption": "Advance your career! Join our Chemical Peels Masterclass with Esther Omondi. Limited seats!",
+      "hashtags": "#SpaTraining #ChemicalPeel #BeautyClass",
+      "cta": "register_class",
+      "platforms": [
+        "facebook",
+        "whatsapp"
+      ],
+      "imageUrl": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "deepLink": "beautybooker://spa/s5/class/c4",
+      "status": "draft",
+      "reach": 0,
+      "clicks": 0,
+      "bookingsAttributed": 0,
+      "createdAt": "2026-07-20T10:00:00Z"
+    },
+    {
+      "id": "sc4",
+      "spaId": "s1",
+      "title": "Weekend Facial Deal",
+      "caption": "Book your Signature Facial this weekend and receive a complimentary eye treatment! Limited slots.",
+      "hashtags": "#NairobiSpa #FacialTreatment #WestlandsSpa",
+      "cta": "book_now",
+      "platforms": [
+        "instagram",
+        "whatsapp"
+      ],
+      "imageUrl": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80",
+      "deepLink": "beautybooker://spa/s1/service/srv1",
+      "status": "published",
+      "reach": 6210,
+      "clicks": 445,
+      "bookingsAttributed": 32,
+      "createdAt": "2026-07-10T08:00:00Z"
+    }
+  ],
+  "socialConnections": [
+    {
+      "spaId": "s5",
+      "platform": "instagram",
+      "connected": true,
+      "handle": "@bofabeachwellness",
+      "connectedAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "spaId": "s5",
+      "platform": "facebook",
+      "connected": true,
+      "handle": "Bofa Beach Wellness Lounge",
+      "connectedAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "spaId": "s5",
+      "platform": "whatsapp",
+      "connected": true,
+      "handle": "+254 712 000 005",
+      "connectedAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "spaId": "s5",
+      "platform": "tiktok",
+      "connected": false
+    },
+    {
+      "spaId": "s5",
+      "platform": "x",
+      "connected": false
+    },
+    {
+      "spaId": "s1",
+      "platform": "instagram",
+      "connected": true,
+      "handle": "@nairobispahub",
+      "connectedAt": "2026-05-15T00:00:00Z"
+    },
+    {
+      "spaId": "s1",
+      "platform": "facebook",
+      "connected": false
+    },
+    {
+      "spaId": "s1",
+      "platform": "whatsapp",
+      "connected": false
+    },
+    {
+      "spaId": "s1",
+      "platform": "tiktok",
+      "connected": false
+    },
+    {
+      "spaId": "s1",
+      "platform": "x",
+      "connected": false
+    }
+  ]
+}

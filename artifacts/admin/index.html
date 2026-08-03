@@ -18,6 +18,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <div id="error-display" style="color: red; padding: 20px; font-family: monospace; white-space: pre-wrap;"></div>
+    <script>
+      window.addEventListener('error', function(event) {
+        document.getElementById('error-display').innerText += '\n' + event.message + '\n' + event.filename + ':' + event.lineno + '\n' + (event.error ? event.error.stack : '');
+      });
+      window.addEventListener('unhandledrejection', function(event) {
+        document.getElementById('error-display').innerText += '\nUnhandled Promise Rejection: ' + event.reason;
+      });
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

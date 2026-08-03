@@ -20,8 +20,16 @@ function NativeTabLayout() {
         <Icon sf={{ default: "scissors", selected: "scissors" }} />
         <Label>Services</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="saved">
+        <Icon sf={{ default: "heart", selected: "heart.fill" }} />
+        <Label>Saved</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="map">
+        <Icon sf={{ default: "map", selected: "map.fill" }} />
+        <Label>Map</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="bookings">
-        <Icon sf={{ default: "calendar", selected: "calendar.fill" }} />
+        <Icon sf={{ default: "calendar", selected: "calendar" }} />
         <Label>Bookings</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
@@ -88,6 +96,30 @@ function ClassicTabLayout() {
               <SymbolView name="scissors" tintColor={color} size={22} />
             ) : (
               <Feather name="scissors" size={21} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="saved"
+        options={{
+          title: "Saved",
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="heart" tintColor={color} size={22} />
+            ) : (
+              <Feather name="heart" size={21} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: "Map",
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="map" tintColor={color} size={22} />
+            ) : (
+              <Feather name="map-pin" size={21} color={color} />
             ),
         }}
       />

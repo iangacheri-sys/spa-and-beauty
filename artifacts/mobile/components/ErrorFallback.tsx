@@ -73,6 +73,14 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           Something went wrong
         </Text>
 
+        {__DEV__ && (
+          <View style={{ backgroundColor: '#fff0f0', borderRadius: 8, padding: 12, width: '100%', marginTop: 8 }}>
+            <Text style={{ color: '#c00', fontSize: 13, fontFamily: monoFont, lineHeight: 20 }} selectable>
+              {error.message}
+            </Text>
+          </View>
+        )}
+
         <Text style={[styles.message, { color: colors.mutedForeground }]}>
           Please reload the app to continue.
         </Text>

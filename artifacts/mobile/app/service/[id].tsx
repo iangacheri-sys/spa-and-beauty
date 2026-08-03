@@ -1,31 +1,89 @@
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Image,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  ActivityIndicator
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useColors } from '@/hooks/useColors';
-import { SERVICES, STAFF, formatPrice } from '@/constants/data';
+import { formatPrice } from '@/constants/data';
+import { apiFetch } from '@/lib/api';
+
+interface Service {
+  id: string;
+  name: string;
+  category: string;
+  duration: number;
+  price: number;
+  description: string;
+  rating: number;
+  reviews: number;
+  image?: string;
+  spaId: string;
+}
+
+interface Therapist {
+  id: string;
+  name: string;
+  specialty: string;
+  experience: string;
+  rating: number;
+  avatarColor?: string;
+  initials?: string;
+}
 
 export default function ServiceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  
+  const [service, setService] = useState<Service | null>(null);
+  const [specialists, setSpecialists] = useState<Therapist[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const service = SERVICES.find((s) => s.id === id);
-  const specialists = service ? STAFF.filter((s) => service.staffIds.includes(s.id)) : [];
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [servicesRes, therapistsRes] = await Promise.all([
+          apiFetch<Service[]>('/services'),
+          apiFetch<Therapist[]>('/therapists')
+        ]);
+        const s = servicesRes.find(s => s.id === id);
+        setService(s || null);
+        if (s) {
+          // For now, let's assume any therapist in the same spa can perform the service
+          // A real implementation would filter by serviceId
+          const spaTherapists = therapistsRes.filter(t => (t as any).spaId === s.spaId);
+          setSpecialists(spaTherapists);
+        }
+      } catch (err) {
+        console.error('Failed to load service', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [id]);
 
   const bottomInset = Platform.OS === 'web' ? 34 : insets.bottom;
   const topInset = Platform.OS === 'web' ? 67 : insets.top;
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
 
   if (!service) {
     return (
@@ -129,8 +187,8 @@ export default function ServiceDetailScreen() {
 
   return (
     <View style={s.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Image source={service.image} style={s.hero} resizeMode="cover" />
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+        <Image source={service.image} style={s.hero} contentFit="cover" transition={200} />
         <View style={s.body}>
           <View style={s.catBadge}>
             <Text style={s.catText}>{service.category}</Text>
@@ -163,6 +221,23 @@ export default function ServiceDetailScreen() {
 
           <Text style={s.sectionTitle}>About this service</Text>
           <Text style={s.description}>{service.description}</Text>
+
+          <Text style={s.sectionTitle}>Gallery</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+            {[
+              'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=500&q=80',
+              'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=500&q=80',
+              'https://images.unsplash.com/photo-1600334129128-685054110de4?w=500&q=80'
+            ].map((img, i) => (
+              <Image 
+                key={i} 
+                source={{ uri: img }} 
+                style={{ width: 140, height: 140, borderRadius: 12, backgroundColor: colors.secondary }} 
+                contentFit="cover" 
+                transition={200}
+              />
+            ))}
+          </ScrollView>
 
           <Text style={s.sectionTitle}>Available Specialists</Text>
           {specialists.map((member) => (

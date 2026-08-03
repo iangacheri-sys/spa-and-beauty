@@ -104,7 +104,7 @@ export default function FeedbackScreen() {
     await addReview({
       bookingId: activeBooking.id,
       serviceId: activeBooking.serviceId,
-      staffId: activeBooking.staffId,
+      therapistId: activeBooking.therapistId,
       rating,
       comment: comment.trim(),
       tipAmount,
@@ -254,7 +254,7 @@ export default function FeedbackScreen() {
   });
 
   const activeService = activeBooking ? SERVICES.find((s) => s.id === activeBooking.serviceId) : null;
-  const activeStaff = activeBooking ? STAFF.find((s) => s.id === activeBooking.staffId) : null;
+  const activeStaff = activeBooking ? STAFF.find((s) => s.id === activeBooking.therapistId) : null;
 
   return (
     <View style={s.container}>
@@ -273,7 +273,7 @@ export default function FeedbackScreen() {
             <Text style={s.sectionLabel}>Awaiting your review</Text>
             {pendingReview.map((booking) => {
               const service = SERVICES.find((s) => s.id === booking.serviceId);
-              const staff = STAFF.find((s) => s.id === booking.staffId);
+              const staff = STAFF.find((s) => s.id === booking.therapistId);
               return (
                 <View key={booking.id} style={s.card}>
                   <View style={s.cardTop}>
@@ -332,7 +332,7 @@ export default function FeedbackScreen() {
             <Text style={s.sectionLabel}>My Reviews</Text>
             {reviewed.map((booking) => {
               const service = SERVICES.find((s) => s.id === booking.serviceId);
-              const staff = STAFF.find((s) => s.id === booking.staffId);
+              const staff = STAFF.find((s) => s.id === booking.therapistId);
               const review = getReviewForBooking(booking.id);
               return (
                 <View key={booking.id} style={s.card}>
@@ -459,3 +459,4 @@ export default function FeedbackScreen() {
     </View>
   );
 }
+
