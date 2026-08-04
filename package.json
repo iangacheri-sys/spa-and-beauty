@@ -23,10 +23,5 @@
     "prettier": "^3.8.3",
     "typescript": "~5.9.3"
   },
-  "dependencies": {
-    "@esbuild/win32-x64": "^0.27.3",
-    "@rollup/rollup-win32-x64-msvc": "^4.62.2",
-    "@tailwindcss/oxide-win32-x64-msvc": "^4.3.2",
-    "lightningcss-win32-x64-msvc": "^1.32.0"
-  }
+  "dependencies": {}
 }

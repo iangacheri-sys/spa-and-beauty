@@ -81,7 +81,6 @@
     "zod": "catalog:"
   },
   "dependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.62.2",
     "zustand": "^5.0.14"
   }
 }

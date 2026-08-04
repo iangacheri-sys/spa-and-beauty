@@ -1,0 +1,147 @@
+# ═════════════════════════════════════════════════════════════════════════════
+# Dockerfile.api — Production image for the Beauty Booker API Server
+# Target: Railway Docker deployment
+# Strategy: 4-stage multi-stage build
+#   1. base     — Node 20 + pnpm@9.15.0 (via npm, NOT corepack)
+#   2. deps     — Install all workspace dependencies
+#   3. builder  — Generate Prisma client, bundle with esbuild, prune to prod
+#   4. runner   — Minimal production image (~150MB)
+# ═════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 1: base
+# Sets up Node 20 LTS, build tools for native addons (argon2), and pnpm.
+# We install pnpm via npm — NOT via corepack — to avoid the
+# ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING corepack bug on Linux.
+# ─────────────────────────────────────────────────────────────────────────────
+FROM node:20-slim AS base
+
+# Build tools required for native Node addons:
+#   argon2  → needs python3 + make + g++
+#   Prisma  → needs openssl (for query engine TLS)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    openssl \
+    libssl-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install pnpm directly via npm — bypasses corepack entirely
+RUN npm install -g pnpm@9.15.0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 2: deps
+# Install ALL workspace dependencies.
+# We copy only package.json files first so this layer is cached as long as
+# dependencies don't change — even if source code does.
+# ─────────────────────────────────────────────────────────────────────────────
+FROM base AS deps
+
+WORKDIR /app
+
+# Workspace configuration (needed before pnpm install)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+
+# Copy every package.json in the workspace (pnpm needs the full dep graph)
+COPY lib/api-zod/package.json              ./lib/api-zod/
+COPY lib/api-spec/package.json             ./lib/api-spec/
+COPY lib/db/package.json                   ./lib/db/
+COPY lib/api-client-react/package.json     ./lib/api-client-react/
+COPY artifacts/api-server/package.json     ./artifacts/api-server/
+COPY artifacts/admin/package.json          ./artifacts/admin/
+COPY artifacts/mobile/package.json         ./artifacts/mobile/
+COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
+COPY scripts/package.json                  ./scripts/
+
+# CRITICAL: Override the Replit-specific minimumReleaseAge: 1440 setting.
+# This setting requires packages to have been published for >24h before
+# allowing installation. On Docker, registry metadata doesn't carry this
+# timestamp context reliably. We override it to 0 for Docker builds only.
+RUN sed -i 's/minimumReleaseAge: 1440/minimumReleaseAge: 0/' pnpm-workspace.yaml
+
+# Install all workspace dependencies.
+# --frozen-lockfile guarantees deterministic, reproducible builds.
+RUN pnpm install --frozen-lockfile
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 3: builder
+# Copy full source, generate Prisma client, bundle the API with esbuild,
+# then use `pnpm deploy` to create a clean production-only node_modules.
+# ─────────────────────────────────────────────────────────────────────────────
+FROM deps AS builder
+
+WORKDIR /app
+
+# Copy all workspace source code on top of installed node_modules
+COPY . .
+
+# Re-apply minimumReleaseAge override (COPY . . overwrites pnpm-workspace.yaml)
+RUN sed -i 's/minimumReleaseAge: 1440/minimumReleaseAge: 0/' pnpm-workspace.yaml
+
+# Generate the Prisma client for linux-debian (the Railway runtime OS).
+# MUST run before esbuild bundling because @prisma/client is externalized
+# from the bundle and must exist as a proper node_module at runtime.
+RUN pnpm --filter @workspace/api-server exec prisma generate
+
+# Bundle the API server with esbuild.
+# Output: artifacts/api-server/dist/index.mjs (single bundled file)
+RUN pnpm --filter @workspace/api-server run build
+
+# Create a production-only deployment folder.
+# pnpm deploy --prod:
+#   - Creates /deploy with only production dependencies (no devDeps)
+#   - Resolves all workspace:* links
+#   - Significantly reduces the final image size
+RUN pnpm deploy --filter @workspace/api-server --prod /deploy
+
+# Copy the generated Prisma query engine into the pruned deployment.
+# (pnpm deploy --prod copies @prisma/client but not the generated .prisma dir)
+RUN cp -r artifacts/api-server/node_modules/.prisma /deploy/node_modules/.prisma
+
+# Copy the esbuild bundle into the deployment folder
+RUN cp -r artifacts/api-server/dist /deploy/dist
+
+# Copy Prisma schema and migrations (needed by `prisma migrate deploy` at startup)
+RUN cp -r artifacts/api-server/prisma /deploy/prisma
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 4: runner
+# Minimal production image. Contains ONLY what's needed to run the server:
+#   /app/dist/          — esbuild bundle
+#   /app/node_modules/  — production deps only (pruned by pnpm deploy)
+#   /app/prisma/        — schema + migrations
+# ─────────────────────────────────────────────────────────────────────────────
+FROM node:20-slim AS runner
+
+# Runtime deps for native addons and Prisma
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    libssl-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Non-root user for security (Railway runs as root by default but this is best practice)
+RUN groupadd --system nodejs && useradd --system --gid nodejs nodeuser
+
+# Copy the pruned production deployment from the builder stage
+COPY --from=builder --chown=nodeuser:nodejs /deploy ./
+
+# Copy the startup script
+COPY --chown=nodeuser:nodejs docker/start-api.sh /start.sh
+RUN chmod +x /start.sh
+
+USER nodeuser
+
+ENV NODE_ENV=production
+ENV PORT=5000
+
+EXPOSE 5000
+
+# Health check — Railway uses this to determine if the service is healthy
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:' + process.env.PORT + '/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
+
+# Start: run migrations, then launch the server
+CMD ["/start.sh"]

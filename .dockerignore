@@ -1,0 +1,58 @@
+# ────────────────────────────────────────────────────────────────────────────
+# .dockerignore — excludes everything that doesn't belong in the Docker build
+# context to keep images small and builds fast.
+# ────────────────────────────────────────────────────────────────────────────
+
+# Version control
+.git
+.gitignore
+
+# Replit-specific files (not needed in Docker)
+.replit
+.replitignore
+.local
+replit.md
+
+# Environment files — secrets must come from Railway env vars, not the image
+.env
+.env.*
+!.env.example
+
+# Local development databases / data
+*.db
+*.sqlite
+
+# Dependency directories — Docker installs its own
+node_modules
+**/node_modules
+
+# Build output — Docker rebuilds these from source
+dist
+**/dist
+artifacts/api-server/dist
+artifacts/admin/dist
+
+# Packages that are NOT deployed to Railway
+artifacts/mobile
+artifacts/mockup-sandbox
+
+# Local dev scripts
+db-setup*.ps1
+start-api.ps1
+
+# Docker support files (already consumed at build time)
+docker-compose.yml
+
+# CI / documentation
+*.md
+DEPLOY.md
+PROJECT_STATUS.md
+
+# Log files
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
