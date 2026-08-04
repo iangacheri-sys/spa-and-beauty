@@ -1,5 +1,0 @@
-{
-  "buildCommand": "pnpm --filter @workspace/admin run build",
-  "outputDirectory": "artifacts/admin/dist",
-  "installCommand": "pnpm install --frozen-lockfile"
-}
