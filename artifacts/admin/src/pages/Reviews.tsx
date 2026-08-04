@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useReviews } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star, MessageCircle, AlertTriangle, ShieldCheck, Loader2 } from "lucide-react";
