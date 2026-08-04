@@ -14,7 +14,7 @@ export class ReviewController {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const item = await reviewService.getById(req.params.id);
+      const item = await reviewService.getById(req.params.id as string);
       res.json(item);
     } catch (err) {
       next(err);
@@ -36,7 +36,7 @@ export class ReviewController {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const item = await reviewService.update(req.params.id, req.body);
+      const item = await reviewService.update(req.params.id as string, req.body);
       res.json(item);
     } catch (err) {
       next(err);
@@ -45,7 +45,7 @@ export class ReviewController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await reviewService.delete(req.params.id);
+      await reviewService.delete(req.params.id as string);
       res.status(204).send();
     } catch (err) {
       next(err);

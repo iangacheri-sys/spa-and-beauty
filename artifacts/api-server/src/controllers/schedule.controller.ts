@@ -5,7 +5,7 @@ export class ScheduleController {
   // Therapist Schedules
   async getSchedules(req: Request, res: Response, next: NextFunction) {
     try {
-      const { therapistId } = req.params;
+      const therapistId = req.params.therapistId as string;
       const schedules = await prisma.therapistSchedule.findMany({
         where: { therapistId },
         orderBy: { dayOfWeek: 'asc' }
@@ -18,7 +18,7 @@ export class ScheduleController {
 
   async setSchedule(req: Request, res: Response, next: NextFunction) {
     try {
-      const { therapistId } = req.params;
+      const therapistId = req.params.therapistId as string;
       const { schedules } = req.body; // Array of { dayOfWeek, startTime, endTime, isWorking }
 
       // Validate therapist belongs to current tenant
@@ -98,7 +98,7 @@ export class ScheduleController {
   async deleteTimeOff(req: Request, res: Response, next: NextFunction) {
     try {
       const spaId = req.tenantId!;
-      const { id } = req.params;
+      const id = req.params.id as string;
 
       const timeOff = await prisma.timeOff.findFirst({
         where: { id, spaId }

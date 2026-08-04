@@ -144,17 +144,16 @@ export class BookingService {
           await prisma.walletTransaction.create({
             data: {
               walletId: wallet.id,
-              type: 'CREDIT',
+              type: 'TOPUP',
               amount: 500,
-              description: `Referral bonus for ${user.name}`,
-              status: 'COMPLETED'
+              description: `Referral bonus for ${user.name}`
             }
           });
         }
       }
     }
 
-    if (['COMPLETED', 'CANCELLED', 'NO_SHOW'].includes(status)) {
+    if (['COMPLETED', 'CANCELLED', 'NO_SHOW'].includes(updated.status)) {
       await spaService.recalculateRanking(updated.spaId);
     }
 

@@ -35,6 +35,7 @@ interface Spa {
   galleries?: string[];
   amenities?: string[];
   isSponsored?: boolean;
+  image?: string;
 }
 
 interface Service {

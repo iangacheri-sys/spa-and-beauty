@@ -35,7 +35,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const body = { ...formData };
+      const body: any = { ...formData };
       if (!body.email) delete body.email;
 
       const res = await fetch("/api/auth/register-partner", {

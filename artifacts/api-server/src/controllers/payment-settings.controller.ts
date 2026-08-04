@@ -63,7 +63,7 @@ export class PaymentSettingsController {
   // GET /api/spas/:spaId/payment-settings (Public: used by Mobile App checkout)
   async getPublicSettings(req: Request, res: Response, next: NextFunction) {
     try {
-      const { spaId } = req.params;
+      const spaId = req.params.spaId as string;
       
       const settings = await prisma.spaPaymentSettings.findUnique({
         where: { spaId }

@@ -15,12 +15,6 @@
     "vercel-build": "pnpm --filter @workspace/admin run build && rm -rf public && cp -r artifacts/admin/dist public"
   },
   "private": true,
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "argon2"
-    ]
-  },
   "devDependencies": {
     "prettier": "^3.8.3",
     "typescript": "~5.9.3"

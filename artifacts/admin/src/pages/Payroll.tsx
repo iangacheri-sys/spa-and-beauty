@@ -119,7 +119,7 @@ export default function Payroll() {
                         <TableHead className="w-[50px]">
                           <input 
                             type="checkbox" 
-                            checked={commissions?.length > 0 && selectedIds.length === commissions.length}
+                            checked={commissions && commissions.length > 0 && selectedIds.length === commissions.length}
                             onChange={toggleSelectAll}
                             className="rounded border-gray-300"
                           />

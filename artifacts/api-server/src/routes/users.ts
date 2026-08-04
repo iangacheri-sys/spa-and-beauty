@@ -52,7 +52,7 @@ router.get('/at-risk', requireAuth, requireRole(['SPA_OWNER', 'MANAGER', 'PLATFO
     // Fetch all bookings for this spa with user info
     const bookings = await prisma.booking.findMany({
       where: { spaId },
-      include: { user: true, service: true },
+      include: { customer: true, service: true },
       orderBy: { date: 'desc' }
     });
 
@@ -68,7 +68,7 @@ router.get('/at-risk', requireAuth, requireRole(['SPA_OWNER', 'MANAGER', 'PLATFO
     for (const b of bookings) {
       if (!clientMap[b.userId]) {
         clientMap[b.userId] = {
-          user: b.user,
+          user: b.customer,
           totalSpend: 0,
           completedCount: 0,
           lastBookingDate: null,
@@ -77,7 +77,7 @@ router.get('/at-risk', requireAuth, requireRole(['SPA_OWNER', 'MANAGER', 'PLATFO
       }
       clientMap[b.userId].bookings.push(b);
       if (b.status === 'COMPLETED') {
-        clientMap[b.userId].totalSpend += b.totalPrice ?? b.service?.price ?? 0;
+        clientMap[b.userId].totalSpend += b.price ?? b.service?.price ?? 0;
         clientMap[b.userId].completedCount++;
         // Track most recent booking date
         if (!clientMap[b.userId].lastBookingDate || b.date > clientMap[b.userId].lastBookingDate!) {

@@ -21,7 +21,7 @@ export class AiService {
     const systemPrompt = await this.buildConciergeSystemPrompt(userId, spaId);
 
     // Define tools the AI can call
-    const tools = [
+    const tools: any = [
       {
         functionDeclarations: [
           {
@@ -67,9 +67,11 @@ export class AiService {
 
       const response = await this.ai.models.generateContent({
         model: 'gemini-2.0-flash',
-        systemInstruction: systemPrompt,
         contents,
-        tools,
+        config: {
+          systemInstruction: systemPrompt,
+          tools,
+        }
       });
 
       const candidate = response.candidates?.[0];
@@ -90,7 +92,8 @@ export class AiService {
       // Execute function calls and add results
       const toolResultParts: any[] = [];
       for (const funcCallPart of funcCalls) {
-        const { name, args } = funcCallPart.functionCall;
+        const name = funcCallPart.functionCall!.name;
+        const args = funcCallPart.functionCall!.args as any;
         let result: any;
 
         try {
@@ -129,10 +132,12 @@ export class AiService {
 
     return this.ai.models.generateContentStream({
       model: 'gemini-2.0-flash',
-      systemInstruction: systemPrompt,
       contents: [
         { role: 'user', parts: [{ text: message }] }
-      ]
+      ],
+      config: {
+        systemInstruction: systemPrompt,
+      }
     });
   }
 
@@ -172,8 +177,10 @@ Do NOT make up data or numbers that aren't in the snapshots above.
 
     const response = await this.ai.models.generateContent({
       model: 'gemini-2.0-flash',
-      systemInstruction: systemPrompt,
       contents: [{ role: 'user', parts: [{ text: message }] }],
+      config: {
+        systemInstruction: systemPrompt,
+      }
     });
 
     return response.text || "I couldn't generate a response. Please try again.";
@@ -218,8 +225,10 @@ Choose the most appropriate CTA from the options. Choose platforms best suited t
 
     const response = await this.ai.models.generateContent({
       model: 'gemini-2.0-flash',
-      systemInstruction: systemPrompt,
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: {
+        systemInstruction: systemPrompt,
+      }
     });
 
     const text = response.text || '{}';
@@ -361,10 +370,10 @@ Choose the most appropriate CTA from the options. Choose platforms best suited t
         therapistId,
         date,
         timeSlot,
-        notes: notes || null,
+
         status: 'UPCOMING',
-        totalPrice: service.price,
-        depositPaid: 0,
+        price: service.price,
+        depositPaid: false,
       },
       include: { service: true, therapist: true }
     });
@@ -376,7 +385,7 @@ Choose the most appropriate CTA from the options. Choose platforms best suited t
       therapist: booking.therapist?.name,
       date: booking.date,
       time: booking.timeSlot,
-      total: booking.totalPrice,
+      total: booking.price,
       message: `Booking confirmed! Your appointment for ${booking.service?.name} with ${booking.therapist?.name} on ${booking.date} at ${booking.timeSlot} is confirmed.`
     };
   }
@@ -441,7 +450,7 @@ ${user?.bookings.map(b => `${b.service?.name} on ${b.date} at ${b.timeSlot}`).jo
 
     const bookings = await prisma.booking.findMany({
       where: { spaId },
-      include: { user: true, service: true },
+      include: { customer: true, service: true },
       orderBy: { date: 'desc' }
     });
 
@@ -449,10 +458,10 @@ ${user?.bookings.map(b => `${b.service?.name} on ${b.date} at ${b.timeSlot}`).jo
 
     for (const b of bookings) {
       if (!clientMap[b.userId]) {
-        clientMap[b.userId] = { user: b.user, totalSpend: 0, completedCount: 0, lastBookingDate: null };
+        clientMap[b.userId] = { user: b.customer, totalSpend: 0, completedCount: 0, lastBookingDate: null };
       }
       if (b.status === 'COMPLETED') {
-        clientMap[b.userId].totalSpend += b.totalPrice ?? b.service?.price ?? 0;
+        clientMap[b.userId].totalSpend += b.price ?? b.service?.price ?? 0;
         clientMap[b.userId].completedCount++;
         if (!clientMap[b.userId].lastBookingDate || b.date > clientMap[b.userId].lastBookingDate!) {
           clientMap[b.userId].lastBookingDate = b.date;
