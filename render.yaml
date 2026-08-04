@@ -1,0 +1,33 @@
+services:
+  # 1. Backend API Service
+  - type: web
+    name: beauty-booker-api
+    env: node
+    buildCommand: pnpm install && pnpm --filter @workspace/api-server run build
+    startCommand: pnpm --filter @workspace/api-server run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PNPM_VERSION
+        value: 9.15.0
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+  # 2. Admin Dashboard (Frontend)
+  - type: web
+    name: beauty-booker-admin
+    env: static
+    buildCommand: pnpm install && pnpm --filter @workspace/admin run build
+    staticPublishPath: ./artifacts/admin/dist
+    # Redirect all 404s to index.html for React Router / SPA routing
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PNPM_VERSION
+        value: 9.15.0
