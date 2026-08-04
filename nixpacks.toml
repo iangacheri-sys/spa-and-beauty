@@ -1,0 +1,6 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "pnpm-9_x"]
+
+[variables]
+# Disable corepack explicitly to prevent the ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING bug
+COREPACK_ENABLE_STRICT = "0"
