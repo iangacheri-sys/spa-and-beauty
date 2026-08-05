@@ -14,7 +14,7 @@
 # We install pnpm via npm — NOT via corepack — to avoid the
 # ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING corepack bug on Linux.
 # ─────────────────────────────────────────────────────────────────────────────
-FROM node:20-slim AS base
+FROM node:22-slim AS base
 
 # Build tools required for native Node addons:
 #   argon2  → needs python3 + make + g++
@@ -116,7 +116,7 @@ RUN cp -r artifacts/api-server/prisma /deploy/prisma
 #   /app/node_modules/  — production deps only (pruned by pnpm deploy)
 #   /app/prisma/        — schema + migrations
 # ─────────────────────────────────────────────────────────────────────────────
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 
 # Runtime deps for native addons and Prisma
 RUN apt-get update && apt-get install -y --no-install-recommends \
