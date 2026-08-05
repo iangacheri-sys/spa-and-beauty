@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development PORT=5000 pnpm run build && cross-env NODE_ENV=development PORT=5000 pnpm run start",
     "build": "prisma generate && node ./build.mjs",
-    "start": "echo 'Running migrations...' && prisma migrate deploy && echo 'Starting Node...' && node --enable-source-maps ./dist/index.mjs",
+    "start": "node start.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
