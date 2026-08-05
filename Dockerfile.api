@@ -50,9 +50,13 @@ COPY lib/db/package.json                   ./lib/db/
 COPY lib/api-client-react/package.json     ./lib/api-client-react/
 COPY artifacts/api-server/package.json     ./artifacts/api-server/
 COPY artifacts/admin/package.json          ./artifacts/admin/
-COPY artifacts/mobile/package.json         ./artifacts/mobile/
-COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
 COPY scripts/package.json                  ./scripts/
+
+# Create stub package.json for packages excluded by .dockerignore
+# (pnpm workspace resolution needs them to exist but they aren't deployed)
+RUN mkdir -p artifacts/mobile artifacts/mockup-sandbox \
+  && echo '{"name":"@workspace/mobile","version":"0.0.0","private":true}' > artifacts/mobile/package.json \
+  && echo '{"name":"@workspace/mockup-sandbox","version":"0.0.0","private":true}' > artifacts/mockup-sandbox/package.json
 
 # CRITICAL: Override the Replit-specific minimumReleaseAge: 1440 setting.
 # This setting requires packages to have been published for >24h before
