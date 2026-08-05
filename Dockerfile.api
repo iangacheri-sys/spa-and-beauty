@@ -52,11 +52,7 @@ COPY artifacts/api-server/package.json     ./artifacts/api-server/
 COPY artifacts/admin/package.json          ./artifacts/admin/
 COPY scripts/package.json                  ./scripts/
 
-# Create stub package.json for packages excluded by .dockerignore
-# (pnpm workspace resolution needs them to exist but they aren't deployed)
-RUN mkdir -p artifacts/mobile artifacts/mockup-sandbox \
-  && echo '{"name":"@workspace/mobile","version":"0.0.0","private":true}' > artifacts/mobile/package.json \
-  && echo '{"name":"@workspace/mockup-sandbox","version":"0.0.0","private":true}' > artifacts/mockup-sandbox/package.json
+# Removed stub creation — pnpm workspace glob (artifacts/*) will just pick up what exists
 
 # CRITICAL: Override the Replit-specific minimumReleaseAge: 1440 setting.
 # This setting requires packages to have been published for >24h before
@@ -99,9 +95,7 @@ RUN pnpm --filter @workspace/api-server run build
 #   - Significantly reduces the final image size
 RUN pnpm deploy --filter @workspace/api-server --prod /deploy
 
-# Copy the generated Prisma query engine into the pruned deployment.
-# (pnpm deploy --prod copies @prisma/client but not the generated .prisma dir)
-RUN cp -r artifacts/api-server/node_modules/.prisma /deploy/node_modules/.prisma
+# The generated Prisma engine is inside @prisma/client in the pnpm store, which is deployed.
 
 # Copy the esbuild bundle into the deployment folder
 RUN cp -r artifacts/api-server/dist /deploy/dist

@@ -29,10 +29,7 @@ COPY artifacts/api-server/package.json     ./artifacts/api-server/
 COPY artifacts/admin/package.json          ./artifacts/admin/
 COPY scripts/package.json                  ./scripts/
 
-# Create stub package.json for packages excluded by .dockerignore
-RUN mkdir -p artifacts/mobile artifacts/mockup-sandbox \
-  && echo '{"name":"@workspace/mobile","version":"0.0.0","private":true}' > artifacts/mobile/package.json \
-  && echo '{"name":"@workspace/mockup-sandbox","version":"0.0.0","private":true}' > artifacts/mockup-sandbox/package.json
+# Removed stub creation — pnpm workspace glob (artifacts/*) will just pick up what exists
 
 # Override minimumReleaseAge — Replit-specific setting that breaks Docker builds
 RUN sed -i 's/minimumReleaseAge: 1440/minimumReleaseAge: 0/' pnpm-workspace.yaml
