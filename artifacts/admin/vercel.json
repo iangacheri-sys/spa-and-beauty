@@ -3,5 +3,11 @@
   "buildCommand": "cd ../.. && pnpm install && pnpm --filter @workspace/admin run build",
   "outputDirectory": "dist",
   "installCommand": "echo 'install handled in buildCommand'",
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
