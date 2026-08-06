@@ -9,6 +9,17 @@ import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 const apiUrl = import.meta.env.VITE_API_URL as string | undefined;
 if (apiUrl) {
   setBaseUrl(apiUrl);
+  
+  // Override native fetch to automatically prepend VITE_API_URL for relative /api calls.
+  // This ensures all hardcoded fetch('/api/...') calls work in production on Vercel.
+  const originalFetch = window.fetch;
+  window.fetch = async (resource, config) => {
+    if (typeof resource === 'string' && resource.startsWith('/api')) {
+      const baseUrl = apiUrl.replace(/\/api\/?$/, '');
+      resource = `${baseUrl}${resource}`;
+    }
+    return originalFetch(resource, config);
+  };
 }
 
 setAuthTokenGetter(() => localStorage.getItem("admin_token"));
