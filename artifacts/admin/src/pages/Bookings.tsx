@@ -31,9 +31,7 @@ export default function Bookings() {
     }
   };
 
-  if (isLoading) {
-    return <div className="flex h-[200px] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
-  }
+
 
   const getStatusColor = (status: string) => {
     if (status === 'completed') return 'bg-green-100 text-green-800 border-green-200';
@@ -99,7 +97,13 @@ export default function Bookings() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredBookings.map(booking => {
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  <div className="flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                </TableCell>
+              </TableRow>
+            ) : filteredBookings.map(booking => {
               const service = serviceMap.get(booking.serviceId);
               const therapist = therapistMap.get(booking.therapistId);
               

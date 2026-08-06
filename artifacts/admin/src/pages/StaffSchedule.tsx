@@ -241,13 +241,7 @@ export default function StaffSchedule() {
   const { data: therapists = [], isLoading } = useTherapists();
   const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
 
-  if (isLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -264,10 +258,11 @@ export default function StaffSchedule() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {therapists.length === 0 && (
+            {isLoading ? (
+              <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+            ) : therapists.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">No therapists found. Add staff first.</p>
-            )}
-            {therapists.map((t: Therapist) => (
+            ) : therapists.map((t: Therapist) => (
               <div
                 key={t.id}
                 className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50 cursor-pointer transition-colors"
@@ -285,6 +280,7 @@ export default function StaffSchedule() {
                 <Button variant="outline" size="sm">Edit Hours</Button>
               </div>
             ))}
+
           </CardContent>
         </Card>
 
