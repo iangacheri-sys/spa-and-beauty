@@ -55,7 +55,7 @@ export default function Dashboard() {
   const { data: dashboardStats, isLoading: loadingStats } = useDashboardStats();
   const { data: revenueChart = [], isLoading: loadingChart } = useRevenueChart(30);
 
-  if (loadingBookings || loadingServices || loadingTherapists || loadingStats || loadingChart) {
+  if (loadingStats) {
     return <div className="flex h-[200px] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
@@ -125,10 +125,10 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KPI
           title="Today's Appointments"
-          value={String(todaysBookings.length)}
+          value={loadingBookings ? "..." : String(todaysBookings.length)}
           icon={CalendarIcon}
           sub="scheduled for today"
-          trend={12}
+          trend={loadingBookings ? undefined : 12}
         />
         <KPI
           title="Total Revenue (KES)"
@@ -159,7 +159,9 @@ export default function Dashboard() {
             <div className="p-3 bg-green-100 rounded-full"><CheckCircle2 className="w-6 h-6 text-green-600" /></div>
             <div>
               <p className="text-sm text-muted-foreground">Completed</p>
-              <p className="text-2xl font-bold text-green-700">{completedBookings.length}</p>
+              <p className="text-2xl font-bold text-green-700">
+                {loadingBookings ? <Loader2 className="w-4 h-4 animate-spin mt-1" /> : completedBookings.length}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -168,7 +170,9 @@ export default function Dashboard() {
             <div className="p-3 bg-blue-100 rounded-full"><CalendarIcon className="w-6 h-6 text-blue-600" /></div>
             <div>
               <p className="text-sm text-muted-foreground">Upcoming</p>
-              <p className="text-2xl font-bold text-blue-700">{upcomingBookings.length}</p>
+              <p className="text-2xl font-bold text-blue-700">
+                {loadingBookings ? <Loader2 className="w-4 h-4 animate-spin mt-1" /> : upcomingBookings.length}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -178,7 +182,7 @@ export default function Dashboard() {
             <div>
               <p className="text-sm text-muted-foreground">Cancelled / No-Show</p>
               <p className="text-2xl font-bold text-red-600">
-                {bookings.filter((b) => b.status === "cancelled" || b.status === "no-show").length}
+                {loadingBookings ? <Loader2 className="w-4 h-4 animate-spin mt-1" /> : bookings.filter((b) => b.status === "cancelled" || b.status === "no-show").length}
               </p>
             </div>
           </CardContent>
@@ -196,20 +200,26 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="h-[240px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={formattedRevenueChart} margin={{ top: 5, right: 10, bottom: 0, left: 0 }}>
-                  <defs>
-                    <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: number) => [`Ksh ${v.toLocaleString()}`, "Revenue"]} />
-                  <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#revenueGrad)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              {loadingChart ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={formattedRevenueChart} margin={{ top: 5, right: 10, bottom: 0, left: 0 }}>
+                    <defs>
+                      <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip formatter={(v: number) => [`Ksh ${v.toLocaleString()}`, "Revenue"]} />
+                    <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#revenueGrad)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -221,17 +231,23 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="h-[240px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={statusBreakdown} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
-                    {statusBreakdown.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(v: number, name: string) => [v, name]} />
-                  <Legend iconType="circle" iconSize={10} wrapperStyle={{ fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
+              {loadingBookings ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={statusBreakdown} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">
+                      {statusBreakdown.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(v: number, name: string) => [v, name]} />
+                    <Legend iconType="circle" iconSize={10} wrapperStyle={{ fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -249,7 +265,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {therapistStats.length > 0 ? therapistStats.map((t, i) => (
+              {loadingTherapists || loadingBookings ? (
+                <div className="py-8 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+              ) : therapistStats.length > 0 ? therapistStats.map((t, i) => (
                 <div key={t.id} className="flex items-center gap-3">
                   <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                     {i + 1}
@@ -280,14 +298,20 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={serviceStats} layout="vertical" margin={{ left: 0, right: 20 }}>
-                  <XAxis type="number" stroke="#888" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis dataKey="name" type="category" stroke="#888" fontSize={11} tickLine={false} axisLine={false} width={110} />
-                  <Tooltip formatter={(v: number) => [v, "Bookings"]} />
-                  <Bar dataKey="bookingCount" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {loadingServices || loadingBookings ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={serviceStats} layout="vertical" margin={{ left: 0, right: 20 }}>
+                    <XAxis type="number" stroke="#888" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis dataKey="name" type="category" stroke="#888" fontSize={11} tickLine={false} axisLine={false} width={110} />
+                    <Tooltip formatter={(v: number) => [v, "Bookings"]} />
+                    <Bar dataKey="bookingCount" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>

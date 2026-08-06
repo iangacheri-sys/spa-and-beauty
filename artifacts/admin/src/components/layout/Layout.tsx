@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Calendar, Users, Sparkles, UserCheck, Package, Tag, GraduationCap, ClipboardList, Clock, LogOut, Shield, BarChart3, CreditCard, UserCircle2, CalendarDays, BarChart2, Share2, Inbox, ShieldAlert, Wallet, Banknote, Image } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, Sparkles, UserCheck, Package, Tag, GraduationCap, ClipboardList, Clock, LogOut, Shield, BarChart3, CreditCard, UserCircle2, CalendarDays, BarChart2, Share2, Inbox, ShieldAlert, Wallet, Banknote, Image, Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { user, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const role = user?.role;
 
@@ -55,17 +57,33 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-sidebar text-sidebar-foreground flex-shrink-0 fixed inset-y-0 left-0 border-r border-sidebar-border flex flex-col shadow-xl">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold tracking-tight text-white mb-2">Beauty Booker</h1>
-          <div className="flex items-center gap-2 text-xs text-sidebar-foreground/70">
-            {role === 'PLATFORM_ADMIN' && <Shield className="w-3 h-3" />}
-            <span>{roleLabel}</span>
+      <aside className={`w-64 bg-sidebar text-sidebar-foreground flex-shrink-0 fixed inset-y-0 left-0 border-r border-sidebar-border flex flex-col shadow-xl z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-4 md:p-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white mb-2">Beauty Booker</h1>
+            <div className="flex items-center gap-2 text-xs text-sidebar-foreground/70">
+              {role === 'PLATFORM_ADMIN' && <Shield className="w-3 h-3" />}
+              <span>{roleLabel}</span>
+            </div>
+            {user && (
+              <p className="text-sm text-white/80 mt-1 truncate">{user.name}</p>
+            )}
           </div>
-          {user && (
-            <p className="text-sm text-white/80 mt-1 truncate">{user.name}</p>
-          )}
+          <button 
+            className="md:hidden text-white p-1"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
         <nav className="px-4 space-y-1 mt-2 flex-1 overflow-y-auto">
           {navItems.map((item) => {
@@ -75,6 +93,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <Link 
                 key={item.href} 
                 href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-all ${
                   isActive 
                     ? "bg-sidebar-primary text-sidebar-primary-foreground font-medium shadow-md shadow-black/10" 
@@ -99,7 +118,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8 min-h-screen bg-secondary/30 flex flex-col">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 min-h-screen bg-secondary/30 flex flex-col w-full">
+        {/* Mobile Header with Hamburger */}
+        <div className="md:hidden flex items-center justify-between mb-4 bg-white p-4 rounded-xl shadow-sm border border-border/50">
+          <div className="flex items-center gap-2">
+            <h1 className="font-bold text-lg">Beauty Booker</h1>
+          </div>
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-2 bg-secondary rounded-md"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
         {role === 'SPA_OWNER' && user?.ownedSpas?.[0]?.approvalStatus === 'PENDING' && (
           <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3">
