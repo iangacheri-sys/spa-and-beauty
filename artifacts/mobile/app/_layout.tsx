@@ -57,6 +57,7 @@ function RootLayoutNav() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="service/[id]" options={{ headerShown: false, animation: "slide_from_right" }} />
       <Stack.Screen name="booking/[serviceId]" options={{ headerShown: false, animation: "slide_from_bottom" }} />
+      <Stack.Screen name="spa/[id]" options={{ headerShown: false, animation: "slide_from_right" }} />
     </Stack>
   );
 }

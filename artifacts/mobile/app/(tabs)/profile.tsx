@@ -481,16 +481,27 @@ export default function ProfileScreen() {
       </View>
 
       {!editing && (
-        <Pressable 
-          style={s.logoutBtn} 
-          onPress={async () => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            await logout();
-          }}
-        >
-          <Feather name="log-out" size={18} color={colors.destructive} />
-          <Text style={s.logoutText}>Log Out</Text>
-        </Pressable>
+        <>
+          {user?.isDemo || user?.name === 'Guest' ? (
+            <Pressable
+              style={[s.logoutBtn, { borderColor: colors.primary + '40', backgroundColor: colors.primary + '10', marginBottom: 12 }]}
+              onPress={() => router.push('/login')}
+            >
+              <Feather name="log-in" size={18} color={colors.primary} />
+              <Text style={[s.logoutText, { color: colors.primary }]}>Sign In to Your Account</Text>
+            </Pressable>
+          ) : null}
+          <Pressable 
+            style={s.logoutBtn} 
+            onPress={async () => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              await logout();
+            }}
+          >
+            <Feather name="log-out" size={18} color={colors.destructive} />
+            <Text style={s.logoutText}>Log Out</Text>
+          </Pressable>
+        </>
       )}
 
       <Text style={s.versionText}>Spa & Beauty v1.0.0</Text>

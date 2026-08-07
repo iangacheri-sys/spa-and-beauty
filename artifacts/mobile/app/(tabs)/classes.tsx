@@ -81,11 +81,10 @@ function RegistrationModal({
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await apiFetch(`/classes/${cls.id}/enroll`, {
+      const data = await apiFetch<{ status: 'enrolled' | 'waitlist' }>(`/classes/${cls.id}/enroll`, {
         method: 'POST',
         body: JSON.stringify({ name, email, phone }),
-      }) as Response;
-      const data = await res.json();
+      });
       onRegistered(data.status);
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Could not complete registration. Please try again.');

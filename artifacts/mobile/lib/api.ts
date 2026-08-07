@@ -8,11 +8,13 @@ import Constants from 'expo-constants';
 // 2. Expo Go LAN host (auto-detected in dev via Expo debugger)
 // 3. Android emulator localhost alias
 // 4. Generic localhost fallback (iOS simulator / web)
-const expoPublicApiUrl = process.env.EXPO_PUBLIC_API_URL;
+const expoPublicApiUrl = process.env.EXPO_PUBLIC_API_URL
+  ? process.env.EXPO_PUBLIC_API_URL.replace(/\/api\/?$/, '').replace(/\/$/, '')
+  : undefined;
 const debuggerHost = Constants.expoConfig?.hostUri;
 
 export const API_BASE = expoPublicApiUrl
-  ? `${expoPublicApiUrl.replace(/\/$/, '')}/api`
+  ? `${expoPublicApiUrl}/api`
   : debuggerHost
     ? `http://${debuggerHost.split(':')[0]}:5000/api`
     : Platform.OS === 'android'
