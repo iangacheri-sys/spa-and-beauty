@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, useClasses } from "@/lib/api";
 
 interface Enrollment {
   id: string;
@@ -303,10 +303,7 @@ export default function Training() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: classes = [], isLoading, isError, error } = useQuery<TrainingClass[], Error>({
-    queryKey: ["classes"],
-    queryFn: () => apiFetch<TrainingClass[]>("/api/classes"),
-  });
+  const { data: classes = [], isLoading, isError, error } = useClasses();
 
   // keep rosterClass in sync with latest data
   const freshRosterClass = rosterClass ? classes.find((c) => c.id === rosterClass.id) || rosterClass : null;
