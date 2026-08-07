@@ -303,7 +303,7 @@ export default function Training() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: classes = [], isLoading, isError } = useQuery<TrainingClass[]>({
+  const { data: classes = [], isLoading, isError, error } = useQuery<TrainingClass[], Error>({
     queryKey: ["classes"],
     queryFn: () => apiFetch<TrainingClass[]>("/api/classes"),
   });
@@ -357,8 +357,10 @@ export default function Training() {
       )}
 
       {isError && (
-        <div className="flex items-center justify-center py-24 gap-3 text-destructive">
-          <AlertCircle className="w-6 h-6" /> Failed to load classes. Check that the API server is running.
+        <div className="flex flex-col items-center justify-center py-24 gap-3 text-destructive text-center">
+          <AlertCircle className="w-6 h-6" /> 
+          <p>Failed to load classes. Check that the API server is running.</p>
+          <p className="text-xs opacity-70 font-mono mt-2">{error?.message || String(error)}</p>
         </div>
       )}
 
